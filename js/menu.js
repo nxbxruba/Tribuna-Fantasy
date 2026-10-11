@@ -28,6 +28,7 @@ function htmlCajon() {
     </div>
     <div class="cajon-seccion">
       <div class="cajon-titulo">Mercado de fichajes</div>
+      ${item('#/fichajes/ultima-hora', '⚡', 'Última hora LaLiga')}
       ${item('#/fichajes/ultimos', '🔄', 'Últimos fichajes')}
       ${item('#/fichajes/rumores', '🗣️', 'Rumores')}
       ${item('#/fichajes/noticias', '🗞️', 'Noticias de fichajes')}

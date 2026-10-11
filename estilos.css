@@ -854,6 +854,7 @@ td.pts { font-weight: 800; }
 .cambio.sube { color: var(--sube); }
 .cambio.baja { color: var(--baja); }
 .cambio.igual { color: var(--texto-suave); }
+.cambio.aviso { color: var(--aviso); }
 
 .foto-jugador {
   width: 40px; height: 40px;

@@ -314,17 +314,77 @@ try {
     Start-Sleep -Seconds 2
   }
 
-  if (-not $ligas.Count -and -not $rumores.Count) { throw 'no se encontró ningún fichaje' }
-  Guardar-Js 'fichajes.js' 'DATOS_FICHAJES' ([ordered]@{
-    actualizado = $ahora
-    fuente      = 'Transfermarkt'
-    ligas       = $ligas
-    rumores     = $rumores.ToArray()
-  })
-  [void]$resumen.Add("Fichajes: $($ligas.Count) ligas, $($rumores.Count) rumores")
+  if (-not $ligas.Count -and -not $rumores.Count) { throw 'Transfermarkt no devolvió datos (desde servidores en la nube suele estar bloqueado)' }
+  [void]$resumen.Add("Fichajes Transfermarkt: $($ligas.Count) ligas, $($rumores.Count) rumores")
 } catch {
-  [void]$resumen.Add("Fichajes: ERROR ($_). Se mantienen los datos anteriores.")
+  [void]$resumen.Add("Fichajes Transfermarkt: ERROR ($_). Se mantienen los datos anteriores.")
 }
+
+# =========================================================
+#  4. ÚLTIMA HORA DEL MERCADO DE LALIGA: Futbol Fantasy
+#     (funciona también desde GitHub, donde Transfermarkt está bloqueado)
+# =========================================================
+$ultimaHora = New-Object System.Collections.ArrayList
+$webUltimaHora = ''
+try {
+  Write-Host 'Fichajes: última hora de LaLiga en Futbol Fantasy...' -ForegroundColor Green
+  $portadaFF = Descargar-Texto 'https://www.futbolfantasy.com/'
+  $webUltimaHora = [regex]::Match($portadaFF, 'https://www\.futbolfantasy\.com/laliga/mercado-fichajes/[a-z0-9-]+').Value
+  if (-not $webUltimaHora) { throw 'no se encontró la página del mercado' }
+  $html = Descargar-Texto $webUltimaHora
+  $anio = (Get-Date).Year
+  $dia = ''
+  # Se recorre la página en orden: los títulos "🗓️ Viernes 09/10" marcan el día de las tarjetas siguientes
+  foreach ($trozo in [regex]::Split($html, '(?=<h2 class="col-12 font-weight-bold title-container[^"]*"><span>)|<div class="mercado-card">')) {
+    $titulo = [regex]::Match($trozo, '^<h2 class="col-12 font-weight-bold title-container[^"]*"><span>[^<]*?(\d{2})/(\d{2})')
+    if ($titulo.Success) { $dia = "$anio-$($titulo.Groups[2].Value)-$($titulo.Groups[1].Value)"; continue }
+    if ($trozo -notmatch 'mercado-card-hora') { continue }
+    $titular = [regex]::Match($trozo, 'class="mercado-card-titular">(.*?)(?:<span class="mercado-card-fuente">\(([^)]*)\)</span>)?\s*</(?:span|a)>')
+    $equipos = New-Object System.Collections.ArrayList
+    foreach ($m in [regex]::Matches($trozo, '<a class="mercado-equipo-link"[^>]*title="([^"]+)">\s*<img[^>]*src="([^"]+)"')) {
+      $escudo = $m.Groups[2].Value
+      if ($escudo.StartsWith('//')) { $escudo = 'https:' + $escudo }
+      [void]$equipos.Add([ordered]@{ nombre = [System.Net.WebUtility]::HtmlDecode($m.Groups[1].Value); escudo = $escudo })
+    }
+    $hora = [regex]::Match($trozo, 'mercado-card-hora"><span[^>]*></span>\s*(\d{1,2}:\d{2})').Groups[1].Value
+    [void]$ultimaHora.Add([ordered]@{
+      fecha    = if ($dia) { "$($dia)T$hora" } else { '' }
+      jugador  = [System.Net.WebUtility]::HtmlDecode([regex]::Match($trozo, '<img[^>]*alt="([^"]+)"').Groups[1].Value)
+      foto     = [regex]::Match($trozo, 'data-src="(https://media\.futbolfantasy\.com/[^"]+/jugadores/ficha/[^"]+)"').Groups[1].Value
+      titular  = Limpiar $titular.Groups[1].Value
+      medio    = [System.Net.WebUtility]::HtmlDecode($titular.Groups[2].Value)
+      tipo     = Limpiar ([regex]::Match($trozo, '<span class="te-lbl">([^<]+)</span>').Groups[1].Value)
+      equipos  = $equipos.ToArray()
+      resumen  = Limpiar ([regex]::Match($trozo, '<p class="mercado-card-extracto">(.*?)</p>').Groups[1].Value)
+      noticia  = [regex]::Match($trozo, 'href="(https://www\.futbolfantasy\.com/[^"]*/noticias/[^"]+)"').Groups[1].Value
+    })
+  }
+  if (-not $ultimaHora.Count) { throw 'no se encontró ninguna noticia del mercado' }
+  [void]$resumen.Add("Fichajes Futbol Fantasy: $($ultimaHora.Count) movimientos de LaLiga")
+} catch {
+  [void]$resumen.Add("Fichajes Futbol Fantasy: ERROR ($_). Se mantienen los datos anteriores.")
+}
+
+# ----- Guardar fichajes: lo nuevo de cada fuente y, si una falló, lo que había antes -----
+$previoFichajes = $null
+$archivoFichajes = Join-Path $carpeta 'fichajes.js'
+if (Test-Path $archivoFichajes) {
+  try {
+    $texto = [IO.File]::ReadAllText($archivoFichajes, $utf8)
+    $previoFichajes = $texto.Substring($texto.IndexOf('=') + 1).Trim().TrimEnd(';') | ConvertFrom-Json
+  } catch { }
+}
+$hayTM = ($ligas -and $ligas.Count) -or ($rumores -and $rumores.Count)
+$datosFichajes = [ordered]@{
+  actualizado    = if ($hayTM) { $ahora } else { $previoFichajes.actualizado }
+  fuente         = 'Transfermarkt'
+  ligas          = if ($hayTM) { $ligas } else { $previoFichajes.ligas }
+  rumores        = if ($hayTM) { $rumores.ToArray() } else { @($previoFichajes.rumores) }
+  ultimaHoraAct  = if ($ultimaHora.Count) { $ahora } else { $previoFichajes.ultimaHoraAct }
+  ultimaHoraWeb  = if ($webUltimaHora) { $webUltimaHora } else { $previoFichajes.ultimaHoraWeb }
+  ultimaHora     = if ($ultimaHora.Count) { $ultimaHora.ToArray() } else { @($previoFichajes.ultimaHora | Where-Object { $_ }) }
+}
+if ($hayTM -or $ultimaHora.Count -or $previoFichajes) { Guardar-Js 'fichajes.js' 'DATOS_FICHAJES' $datosFichajes }
 
 Write-Host ''
 Write-Host 'Resumen:' -ForegroundColor Green

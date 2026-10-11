@@ -9,7 +9,12 @@
    ========================================================= */
 const LIGAS_FICHAJES = ['esp.1', 'eng.1', 'ita.1', 'ger.1', 'fra.1', 'esp.2', 'por.1', 'ned.1', 'eng.2', 'tur.1', 'bel.1', 'sco.1', 'mex.1', 'arg.1', 'bra.1', 'usa.1', 'ksa.1'];
 const FILTROS_COSTE = [['', 'Todos'], ['traspaso', 'Traspasos'], ['cesion', 'Cesiones'], ['libre', 'Libres']];
-const PESTANAS_FICHAJES = [['ultimos', 'Últimos fichajes'], ['rumores', 'Rumores'], ['noticias', 'Noticias']];
+const PESTANAS_FICHAJES = [['ultima-hora', 'Última hora LaLiga'], ['ultimos', 'Últimos fichajes'], ['rumores', 'Rumores'], ['noticias', 'Noticias']];
+// Tipos de movimiento de Futbol Fantasy, del más seguro al menos, con su color
+const TIPOS_MOVIMIENTO = [
+  ['Oficial', 'sube'], ['Cerrado', 'sube'], ['Acuerdo', 'aviso'], ['Negociación', 'aviso'],
+  ['Interés', 'igual'], ['Rumor', 'igual'], ['Cedible', 'igual'], ['Cancelado', 'baja'],
+];
 
 const datosFichajes = () => window.DATOS_FICHAJES || null;
 
@@ -45,12 +50,67 @@ function filaTraspaso(t, derecha) {
 
 async function vistaFichajes(pestana, params) {
   if (pestana === 'traspasos') pestana = 'ultimos'; // enlaces antiguos
-  const contenido = { ultimos: fichajesUltimos, rumores: fichajesRumores, noticias: fichajesNoticias }[pestana];
+  const contenido = {
+    'ultima-hora': fichajesUltimaHora, ultimos: fichajesUltimos, rumores: fichajesRumores, noticias: fichajesNoticias,
+  }[pestana];
   if (!contenido) return vistaNoEncontrada();
   const r = await contenido(params);
   return {
     html: `<header class="cab-pagina"><div><p class="cab-sub">Altas, bajas y rumores</p><h1>🔄 Mercado de fichajes</h1></div></header>
       ${pestanas(PESTANAS_FICHAJES, pestana, '#/fichajes/')}${r.html}`,
+  };
+}
+
+/* ----- Última hora del mercado de LaLiga (Futbol Fantasy) ----- */
+function colorTipo(tipo) {
+  return (TIPOS_MOVIMIENTO.find(([t]) => normalizar(t) === normalizar(tipo)) || [, 'igual'])[1];
+}
+
+async function fichajesUltimaHora(params) {
+  const d = datosFichajes();
+  const lista = d?.ultimaHora || [];
+  if (!lista.length) {
+    return { html: vacio('Todavía no hay movimientos. Ejecuta "Actualizar datos.bat" para descargarlos.', '🔄') };
+  }
+  const presentes = TIPOS_MOVIMIENTO.map(([t]) => t).filter((t) => lista.some((x) => x.tipo === t));
+  const filtro = presentes.includes(params.get('tipo')) ? params.get('tipo') : '';
+  const filtrados = lista.filter((x) => !filtro || x.tipo === filtro);
+
+  const porDia = new Map();
+  for (const x of filtrados) {
+    const clave = (x.fecha || '').slice(0, 10) || 'sin-fecha';
+    if (!porDia.has(clave)) porDia.set(clave, []);
+    porDia.get(clave).push(x);
+  }
+
+  const viejo = d.ultimaHoraAct && (Date.now() - new Date(d.ultimaHoraAct)) / 36e5 > 30;
+  const chips = `<div class="chips">
+    <a class="chip ${filtro ? '' : 'activo'}" href="#/fichajes/ultima-hora">Todos</a>
+    ${presentes.map((t) => `<a class="chip ${t === filtro ? 'activo' : ''}" href="#/fichajes/ultima-hora?tipo=${enc(t)}">${esc(t)}</a>`).join('')}
+  </div>`;
+
+  const tarjeta = (x) => {
+    const enlace = urlSegura(x.noticia) || urlSegura(d.ultimaHoraWeb);
+    const hora = (x.fecha || '').slice(11, 16);
+    return `<a class="traspaso" href="${enlace}" target="_blank" rel="noopener noreferrer">
+      ${urlSegura(x.foto) ? `<img class="foto-jugador" src="${urlSegura(x.foto)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="foto-jugador"></span>'}
+      <div style="min-width:0">
+        <b>${esc(x.jugador)}</b> <span class="cambio ${colorTipo(x.tipo)}">● ${esc(x.tipo)}</span>
+        <div>${esc(x.titular)}${x.medio ? ` <small>(${esc(x.medio)})</small>` : ''}</div>
+        ${x.equipos?.length ? `<div class="clubes">${x.equipos.map(clubHtml).join('<span class="texto-suave">→</span>')}</div>` : ''}
+        ${x.resumen ? `<small>${esc(x.resumen)}</small>` : ''}
+      </div>
+      <div class="coste"><small>${esc(hora)}</small></div>
+    </a>`;
+  };
+
+  return {
+    html: `<p class="nota">${viejo ? '⚠️ ' : ''}Movimientos del mercado de LaLiga según <a href="${urlSegura(d.ultimaHoraWeb)}" target="_blank" rel="noopener noreferrer" style="color:var(--acento)">Futbol Fantasy</a>${d.ultimaHoraAct ? ` · actualizados ${esc(haceTiempo(d.ultimaHoraAct).toLowerCase())}` : ''}. Pulsa uno para leer la noticia.</p>
+      ${chips}
+      ${[...porDia].map(([dia, items]) => `<section class="tarjeta">
+        <h2 class="cab-dia capital">${dia === 'sin-fecha' ? 'Sin fecha' : esc(fmtDiaLargo(new Date(dia + 'T12:00:00')))}</h2>
+        ${items.map(tarjeta).join('')}
+      </section>`).join('') || vacio('No hay movimientos de este tipo.', '🔄')}`,
   };
 }
 

@@ -17,7 +17,7 @@ const RUTAS = {
   buscar: (p, q) => vistaBuscar(q),
   favoritos: () => vistaFavoritos(),
   fantasy: ([pestana, id], q) => (pestana === 'jugador' ? vistaFantasyJugador(id) : vistaFantasy(pestana || 'mercado', q)),
-  fichajes: ([pestana], q) => vistaFichajes(pestana || 'ultimos', q),
+  fichajes: ([pestana], q) => vistaFichajes(pestana || 'ultima-hora', q),
   ajustes: () => vistaAjustes(),
 };
 
