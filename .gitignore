@@ -1,0 +1,9 @@
+# Carpeta que genera el robot de publicación
+dist/
+
+# Configuración local de Claude Code
+.claude/
+
+# Archivos del sistema
+Thumbs.db
+desktop.ini

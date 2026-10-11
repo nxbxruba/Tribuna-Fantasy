@@ -1,0 +1,71 @@
+# Publica Tribuna Fantasy en Cloudflare Pages y mantiene los datos al día.
+# - Cada vez que subes cambios a GitHub (rama main) se publica la web.
+# - Cada 3 horas se actualizan Fantasy (LaLiga Fantasy), alineaciones probables
+#   (Futbol Fantasy) y fichajes (Transfermarkt).
+# Necesita dos secretos en GitHub (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN  y  CLOUDFLARE_ACCOUNT_ID
+# El repositorio debe ser PÚBLICO para que los minutos de GitHub Actions sean ilimitados y gratis.
+name: Publicar web
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 */3 * * *"   # cada 3 horas (hora UTC)
+  workflow_dispatch: {}       # botón "Run workflow" para publicar a mano
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      # El historial de valores Fantasy se guarda entre ejecuciones (así cada vez solo descarga lo nuevo)
+      - name: Recuperar el historial Fantasy
+        uses: actions/cache/restore@v4
+        with:
+          path: datos/cache-fantasy.json
+          key: cache-fantasy-${{ github.run_id }}
+          restore-keys: cache-fantasy-
+
+      - name: Actualizar datos (Fantasy, alineaciones probables y fichajes)
+        shell: powershell
+        continue-on-error: true
+        run: .\actualizar-datos.ps1 -MinutosHistorial 15
+
+      - name: Guardar el historial Fantasy
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: datos/cache-fantasy.json
+          key: cache-fantasy-${{ github.run_id }}
+
+      # Solo se publican los archivos de la web (no los scripts ni las instrucciones)
+      - name: Preparar la carpeta publicada
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force dist, dist\datos | Out-Null
+          Copy-Item index.html, estilos.css, manifest.webmanifest, sw.js -Destination dist
+          Copy-Item js, iconos -Destination dist -Recurse
+          Copy-Item datos\*.js -Destination dist\datos
+
+      - name: Crear el proyecto en Cloudflare (solo la primera vez)
+        shell: powershell
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@3 pages project create tribuna-fantasy --production-branch=main
+
+      - name: Publicar en Cloudflare Pages
+        shell: powershell
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@3 pages deploy dist --project-name=tribuna-fantasy --branch=main --commit-dirty=true

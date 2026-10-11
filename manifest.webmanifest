@@ -1,0 +1,17 @@
+{
+  "name": "Tribuna Fantasy",
+  "short_name": "Tribuna",
+  "description": "Resultados en directo, clasificaciones, posibles alineaciones, fichajes, Fantasy y quiniela.",
+  "lang": "es",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c1110",
+  "theme_color": "#0a8f4e",
+  "icons": [
+    { "src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
