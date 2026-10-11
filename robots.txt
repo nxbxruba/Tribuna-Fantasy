@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://infofut-fantasy.pages.dev/sitemap.xml

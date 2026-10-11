@@ -51,7 +51,8 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force dist, dist\datos | Out-Null
-          Copy-Item index.html, estilos.css, manifest.webmanifest, sw.js -Destination dist
+          Copy-Item index.html, estilos.css, manifest.webmanifest, sw.js, robots.txt, sitemap.xml -Destination dist
+          Get-ChildItem google*.html -ErrorAction SilentlyContinue | Copy-Item -Destination dist
           Copy-Item js, iconos -Destination dist -Recurse
           Copy-Item datos\*.js -Destination dist\datos
           if (Test-Path datos\estado.json) { Copy-Item datos\estado.json -Destination dist\datos }

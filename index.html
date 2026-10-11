@@ -4,7 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>InfoFut Fantasy</title>
-  <meta name="description" content="Resultados en directo, clasificaciones, posibles alineaciones, fichajes y Fantasy de LaLiga.">
+  <meta name="description" content="InfoFut Fantasy: resultados de fútbol en directo, clasificaciones, posible 11 comparando fuentes, fichajes y Fantasy de LaLiga con valores oficiales.">
+  <link rel="canonical" href="https://infofut-fantasy.pages.dev/">
+  <!-- Ficha para buscadores: así Google sabe que el sitio se llama "InfoFut Fantasy" -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "InfoFut Fantasy",
+      "alternateName": ["InfoFut", "Info Fut Fantasy"],
+      "url": "https://infofut-fantasy.pages.dev/",
+      "inLanguage": "es",
+      "description": "Resultados de fútbol en directo, posible 11, fichajes y Fantasy de LaLiga."
+    }
+  </script>
   <meta name="theme-color" content="#0a8f4e">
   <!-- Vista previa al compartir el enlace (WhatsApp, Telegram, redes sociales) -->
   <meta property="og:type" content="website">
@@ -49,7 +62,12 @@
   <div class="velo" id="velo"></div>
   <aside class="cajon" id="cajon" aria-label="Menú"></aside>
 
-  <main class="contenedor" id="app" aria-live="polite"></main>
+  <main class="contenedor" id="app" aria-live="polite">
+    <!-- Texto inicial (lo ven los buscadores; se sustituye en cuanto carga la web) -->
+    <h1 class="titulo-seccion">InfoFut Fantasy</h1>
+    <p class="nota">Resultados de fútbol en directo de LaLiga, Premier League, Champions y más ligas; posible 11 comparando fuentes;
+      últimos fichajes y rumores; y Fantasy de LaLiga con valores oficiales, subidas, bajadas y chollos.</p>
+  </main>
 
   <footer class="pie contenedor">
     <p>Datos: ESPN (partidos y noticias), LaLiga Fantasy (precios), Futbol Fantasy (alineaciones probables) y Transfermarkt (fichajes). Proyecto personal sin afiliación con ligas ni clubes.</p>
