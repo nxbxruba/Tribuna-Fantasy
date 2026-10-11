@@ -1,5 +1,5 @@
 ﻿# =========================================================
-#  ACTUALIZAR DATOS DE TRIBUNA FANTASY
+#  ACTUALIZAR DATOS DE INFOFUT FANTASY
 #  Descarga y guarda en la carpeta "datos":
 #    1. Fantasy: precios oficiales de LaLiga Fantasy (+ historial)
 #    2. Alineaciones probables de Futbol Fantasy (LaLiga)

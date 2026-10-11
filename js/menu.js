@@ -9,7 +9,7 @@ const botonMenu = document.getElementById('abrir-menu');
 function htmlCajon() {
   const item = (href, icono, texto) => `<a href="${href}"><span class="icono-item">${icono}</span>${esc(texto)}</a>`;
   return `<div class="cajon-cab">
-      <span class="marca"><img class="logo" src="iconos/logo.svg" alt="" width="30" height="30">Tribuna <span>Fantasy</span></span>
+      <span class="marca"><img class="logo" src="iconos/logo.svg" alt="" width="30" height="30">InfoFut <span>Fantasy</span></span>
       <button class="boton-icono" type="button" id="cerrar-menu" aria-label="Cerrar menú">✕</button>
     </div>
     <div class="cajon-seccion">
@@ -143,7 +143,7 @@ async function vistaAjustes() {
 
       <h2 class="titulo-seccion" style="font-size:15px">Instalar en el móvil</h2>
       <section class="tarjeta relleno">
-        <p style="margin-top:0">Instala Tribuna Fantasy en tu pantalla de inicio para abrirla como una app.</p>
+        <p style="margin-top:0">Instala InfoFut Fantasy en tu pantalla de inicio para abrirla como una app.</p>
         <button class="boton principal ${avisoInstalacion ? '' : 'oculto'}" type="button" data-accion="instalar">📲 Instalar app</button>
         <p class="nota" style="margin:12px 0 0">${esIOS
           ? 'En iPhone: abre la web en Safari, pulsa el botón Compartir (cuadrado con flecha) y elige «Añadir a pantalla de inicio».'

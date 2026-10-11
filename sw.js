@@ -7,7 +7,7 @@
    internet (para tener lo último) y, sin conexión, usa la copia.
    Si cambias algún archivo, sube el número de VERSION.
    ========================================================= */
-const VERSION = 'tribuna-fantasy-v5';
+const VERSION = 'infofut-fantasy-v6';
 const ARCHIVOS = [
   './',
   'index.html',

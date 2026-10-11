@@ -1,4 +1,4 @@
-# Publica Tribuna Fantasy en Cloudflare Pages y mantiene los datos al día.
+# Publica InfoFut Fantasy en Cloudflare Pages y mantiene los datos al día.
 # - Cada vez que subes cambios a GitHub (rama main) se publica la web.
 # - Cada 3 horas se actualizan Fantasy (LaLiga Fantasy), alineaciones probables
 #   (Futbol Fantasy) y fichajes (Transfermarkt).
@@ -62,11 +62,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@3 pages project create tribuna-fantasy --production-branch=main
+        run: npx --yes wrangler@3 pages project create infofut-fantasy --production-branch=main
 
       - name: Publicar en Cloudflare Pages
         shell: powershell
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@3 pages deploy dist --project-name=tribuna-fantasy --branch=main --commit-dirty=true
+        run: npx --yes wrangler@3 pages deploy dist --project-name=infofut-fantasy --branch=main --commit-dirty=true

@@ -1,4 +1,4 @@
-# Tribuna Fantasy
+# InfoFut Fantasy
 
 Web/app de fútbol para móvil y ordenador: resultados en directo, 26 ligas, posible 11 comparando fuentes,
 fichajes y rumores al día y Fantasy de LaLiga con valores oficiales. Se instala como una app y es **gratis**.
@@ -53,21 +53,21 @@ Fuera de LaLiga solo hay "mi cálculo".
 ## Publicarla gratis como app (con datos que se actualizan solos)
 
 Coste: **0 €**. Se publica igual que ValArsenal: GitHub (cuenta `nxbxruba`) + GitHub Desktop +
-GitHub Actions + **Cloudflare Pages**. La dirección será `https://tribuna-fantasy.pages.dev`.
+GitHub Actions + **Cloudflare Pages**. La dirección será `https://infofut-fantasy.pages.dev`.
 
 1. **GitHub Desktop** → File → *Add local repository* → elige esta carpeta (`App Futbol`) →
-   **Publish repository**, con el nombre `tribuna-fantasy` y **sin** marcar "Keep this code private"
+   **Publish repository**, con el nombre `infofut-fantasy` y **sin** marcar "Keep this code private"
    (público = minutos de GitHub Actions ilimitados y gratis).
 2. **Cloudflare** (https://dash.cloudflare.com):
    - *Account ID*: en **Workers & Pages**, columna de la derecha → copiar.
    - *API token*: tu perfil → **API Tokens** → *Create Token* → plantilla **Edit Cloudflare Workers**
      (incluye Cloudflare Pages) → *Continue to summary* → *Create Token* → copiar.
-3. **GitHub** → repositorio `tribuna-fantasy` → **Settings → Secrets and variables → Actions** →
+3. **GitHub** → repositorio `infofut-fantasy` → **Settings → Secrets and variables → Actions** →
    *New repository secret*, dos veces:
    - `CLOUDFLARE_API_TOKEN` = el token
    - `CLOUDFLARE_ACCOUNT_ID` = el Account ID
 4. **Actions** → "Publicar web" → **Run workflow**. En unos minutos estará en
-   `https://tribuna-fantasy.pages.dev`.
+   `https://infofut-fantasy.pages.dev`.
 5. Ábrela en el móvil e instálala: Android → menú ⋮ → **Instalar aplicación**;
    iPhone → Safari → Compartir → **Añadir a pantalla de inicio**.
 

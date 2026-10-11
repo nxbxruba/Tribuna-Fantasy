@@ -1,7 +1,7 @@
 {
-  "name": "Tribuna Fantasy",
-  "short_name": "Tribuna",
-  "description": "Resultados en directo, clasificaciones, posibles alineaciones, fichajes, Fantasy y quiniela.",
+  "name": "InfoFut Fantasy",
+  "short_name": "InfoFut",
+  "description": "Resultados en directo, clasificaciones, posibles alineaciones, fichajes y Fantasy de LaLiga.",
   "lang": "es",
   "start_url": "./#/",
   "scope": "./",
