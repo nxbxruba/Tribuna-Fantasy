@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 630" width="100%" height="100%">
+  <!-- Imagen que se ve al compartir el enlace (WhatsApp, Telegram, redes...).
+       Todo lo importante va en el cuadrado central (x 285-915) por si la app la recorta en cuadrado. -->
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f8a4c"/>
+      <stop offset="1" stop-color="#063d20"/>
+    </linearGradient>
+    <radialGradient id="foco" cx="0.5" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#fondo)"/>
+  <rect width="1200" height="630" fill="url(#foco)"/>
+
+  <!-- Gradas de fondo muy suaves -->
+  <path d="M-40 560 Q600 700 1240 560" fill="none" stroke="#ffffff" stroke-opacity=".07" stroke-width="40" stroke-dasharray="44 12"/>
+  <path d="M-40 620 Q600 770 1240 620" fill="none" stroke="#ffffff" stroke-opacity=".1" stroke-width="44" stroke-dasharray="50 13"/>
+
+  <!-- Logo -->
+  <image href="logo.svg" xlink:href="logo.svg" x="460" y="58" width="280" height="280"/>
+
+  <!-- Nombre y lema -->
+  <text x="600" y="440" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="78" font-weight="800" fill="#ffffff" letter-spacing="-1">InfoFut <tspan fill="#5ce39a">Fantasy</tspan></text>
+  <text x="600" y="502" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="600" fill="#ffffff" fill-opacity=".85">Resultados · Posible 11 · Fichajes · Fantasy</text>
+</svg>

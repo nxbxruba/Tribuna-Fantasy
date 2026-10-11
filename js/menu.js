@@ -43,6 +43,7 @@ function htmlCajon() {
     <div class="cajon-seccion">
       <div class="cajon-titulo">Más</div>
       ${item('#/ajustes', '⚙️', 'Ajustes')}
+      ${item(`mailto:${CORREO_CONTACTO}`, '✉️', 'Contacto')}
       <button class="cajon-boton oculto" type="button" data-accion="instalar"><span class="icono-item">📲</span>Instalar app</button>
     </div>`;
 }
@@ -118,6 +119,7 @@ document.addEventListener('click', (e) => {
 /* =========================================================
    VISTA: AJUSTES
    ========================================================= */
+const CORREO_CONTACTO = 'rubenitus3021@gmail.com';
 async function vistaAjustes() {
   const tema = almacen.leer('tema', 'auto');
   const seleccion = new Set(ligasInicio().map((l) => l.id));
@@ -151,6 +153,15 @@ async function vistaAjustes() {
           La instalación solo funciona cuando la web está publicada en internet.</p>
       </section>
 
+      <h2 class="titulo-seccion" style="font-size:15px" id="contacto">Contacto</h2>
+      <section class="tarjeta relleno">
+        <p style="margin-top:0">¿Tienes una idea, has visto un error o quieres sugerir algo? Escríbeme:</p>
+        <div class="fila-botones">
+          <a class="boton principal" href="mailto:${CORREO_CONTACTO}?subject=${enc('InfoFut Fantasy')}">✉️ ${esc(CORREO_CONTACTO)}</a>
+          <button class="boton" type="button" id="copiar-correo">📋 Copiar correo</button>
+        </div>
+      </section>
+
       <h2 class="titulo-seccion" style="font-size:15px">Mis datos</h2>
       <section class="tarjeta relleno">
         <p style="margin-top:0" class="nota">Tus equipos favoritos y ajustes se guardan solo en este dispositivo.</p>
@@ -169,6 +180,9 @@ async function vistaAjustes() {
       casillas.forEach((c) => c.addEventListener('change', guardarLigas));
       document.getElementById('ligas-todas').addEventListener('click', () => { casillas.forEach((c) => { c.checked = true; }); guardarLigas(); });
       document.getElementById('ligas-ninguna').addEventListener('click', () => { casillas.forEach((c) => { c.checked = false; }); guardarLigas(); });
+      document.getElementById('copiar-correo').addEventListener('click', async () => {
+        avisar((await copiarTexto(CORREO_CONTACTO)) ? 'Correo copiado' : 'No se pudo copiar');
+      });
       document.getElementById('borrar-datos').addEventListener('click', () => {
         if (!confirm('¿Seguro? Se borrarán tus equipos favoritos y ajustes de este dispositivo.')) return;
         ['favoritos', 'ligasInicio', 'tema'].forEach((k) => almacen.borrar(k));
