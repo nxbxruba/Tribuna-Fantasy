@@ -54,6 +54,7 @@ jobs:
           Copy-Item index.html, estilos.css, manifest.webmanifest, sw.js -Destination dist
           Copy-Item js, iconos -Destination dist -Recurse
           Copy-Item datos\*.js -Destination dist\datos
+          if (Test-Path datos\estado.json) { Copy-Item datos\estado.json -Destination dist\datos }
 
       - name: Crear el proyecto en Cloudflare (solo la primera vez)
         shell: powershell

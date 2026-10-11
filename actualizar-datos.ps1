@@ -329,3 +329,7 @@ try {
 Write-Host ''
 Write-Host 'Resumen:' -ForegroundColor Green
 foreach ($linea in $resumen) { Write-Host "  - $linea" }
+
+# Informe de la última actualización (se publica con la web para poder revisar si algo falló)
+$informe = [ordered]@{ fecha = $ahora; resumen = $resumen.ToArray() }
+[IO.File]::WriteAllText((Join-Path $carpeta 'estado.json'), ($informe | ConvertTo-Json -Depth 3), $utf8)
