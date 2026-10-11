@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" width="100%" height="100%" role="img" aria-label="InfoFut Fantasy">
+  <title>InfoFut Fantasy</title>
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14b064"/>
+      <stop offset="1" stop-color="#06602f"/>
+    </linearGradient>
+    <radialGradient id="brillo" cx="0.5" cy="0.32" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="oro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/>
+      <stop offset="1" stop-color="#f5a614"/>
+    </linearGradient>
+    <clipPath id="esquinas"><rect width="512" height="512"/></clipPath>
+    <clipPath id="balon"><circle cx="256" cy="222" r="94"/></clipPath>
+    <!-- Pentágono base del balón (apunta hacia arriba) -->
+    <polygon id="pentagono" points="0,-30 28.5,-9.3 17.6,24.3 -17.6,24.3 -28.5,-9.3"/>
+    <!-- Destello de 4 puntas -->
+    <path id="destello" d="M0,-1 C0.12,-0.12 0.12,-0.12 1,0 C0.12,0.12 0.12,0.12 0,1 C-0.12,0.12 -0.12,0.12 -1,0 C-0.12,-0.12 -0.12,-0.12 0,-1 Z"/>
+  </defs>
+
+  <g clip-path="url(#esquinas)">
+    <!-- Fondo -->
+    <rect width="512" height="512" fill="url(#fondo)"/>
+    <rect width="512" height="512" fill="url(#brillo)"/>
+
+    <!-- Tribuna: tres filas de asientos, de la más lejana (atrás) a la más cercana -->
+    <path d="M40 330 Q256 410 472 330" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width="26" stroke-dasharray="20 7"/>
+    <path d="M18 386 Q256 476 494 386" fill="none" stroke="#ffffff" stroke-opacity=".68" stroke-width="30" stroke-dasharray="25 8"/>
+    <path d="M-4 444 Q256 544 516 444" fill="none" stroke="#ffffff" stroke-width="34" stroke-dasharray="30 9"/>
+
+    <!-- Sombra del balón sobre la grada -->
+    <ellipse cx="256" cy="338" rx="74" ry="11" fill="#00331a" opacity=".35"/>
+
+    <!-- Balón -->
+    <circle cx="256" cy="222" r="94" fill="#ffffff"/>
+    <g fill="#14201b" clip-path="url(#balon)">
+      <use xlink:href="#pentagono" transform="translate(256 222) scale(1.12)"/>
+      <use xlink:href="#pentagono" transform="translate(256 128) rotate(180) scale(.95)"/>
+      <use xlink:href="#pentagono" transform="translate(345.4 193) rotate(252) scale(.95)"/>
+      <use xlink:href="#pentagono" transform="translate(311.3 298) rotate(324) scale(.95)"/>
+      <use xlink:href="#pentagono" transform="translate(200.7 298) rotate(36) scale(.95)"/>
+      <use xlink:href="#pentagono" transform="translate(166.6 193) rotate(108) scale(.95)"/>
+    </g>
+    <g stroke="#14201b" stroke-width="6" stroke-linecap="round" clip-path="url(#balon)">
+      <line x1="256" y1="188" x2="256" y2="156"/>
+      <line x1="288.3" y1="211.5" x2="318.7" y2="201.6"/>
+      <line x1="276" y1="249.5" x2="294.8" y2="275.4"/>
+      <line x1="236" y1="249.5" x2="217.2" y2="275.4"/>
+      <line x1="223.7" y1="211.5" x2="193.3" y2="201.6"/>
+    </g>
+    <circle cx="256" cy="222" r="94" fill="none" stroke="#06602f" stroke-opacity=".25" stroke-width="4"/>
+
+    <!-- Destellos dorados: la parte "Fantasy" -->
+    <use xlink:href="#destello" fill="url(#oro)" transform="translate(384 104) scale(46)"/>
+    <use xlink:href="#destello" fill="url(#oro)" transform="translate(128 92) scale(26)"/>
+    <use xlink:href="#destello" fill="#ffe9a3" transform="translate(410 214) scale(16)"/>
+  </g>
+</svg>
