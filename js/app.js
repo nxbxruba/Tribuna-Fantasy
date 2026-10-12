@@ -85,6 +85,34 @@ app.addEventListener('click', (e) => {
 window.addEventListener('hashchange', navegar);
 navegar();
 
+/* =========================================================
+   ACTUALIZAR (importante cuando está instalada como app:
+   no hay barra del navegador para recargar)
+   ========================================================= */
+async function refrescarApp() {
+  document.getElementById('refrescar')?.classList.add('girando');
+  cache.clear();
+  // Si hay una versión nueva de la web, se descarga antes de recargar
+  try {
+    const registro = await navigator.serviceWorker?.getRegistration();
+    await registro?.update();
+  } catch { /* sin service worker (p. ej. abierta desde el archivo) */ }
+  location.reload();
+}
+
+document.getElementById('refrescar').addEventListener('click', refrescarApp);
+
+// Al volver a la app tras más de 5 minutos en segundo plano, se recarga sola
+const MINUTOS_PARA_RECARGAR = 5;
+let ocultaDesde = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    ocultaDesde = Date.now();
+  } else if (ocultaDesde && Date.now() - ocultaDesde > MINUTOS_PARA_RECARGAR * 60000) {
+    refrescarApp();
+  }
+});
+
 // Funcionamiento sin conexión e instalación (solo cuando la web está publicada)
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

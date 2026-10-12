@@ -128,6 +128,15 @@ button { font: inherit; color: inherit; }
 }
 .boton-icono:hover { background: var(--superficie-2); }
 
+.boton-refrescar span {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--texto);
+}
+.boton-refrescar.girando span { animation: girar .7s linear infinite; }
+
 .hamburguesa span {
   display: block;
   width: 20px;
