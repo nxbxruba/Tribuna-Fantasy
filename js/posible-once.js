@@ -241,7 +241,7 @@ function htmlCampo(once) {
         <span class="nombre-ficha">${esc(j.corto)}${j.aviso ? ' ⚠️' : ''}</span>`;
       const titulo = `${esc(j.nombre)}${j.aviso ? ' · ' + esc(j.aviso) : ''}`;
       return j.id
-        ? `<a class="ficha ${claseProbabilidad(j.prob)}" href="#/jugador/${enc(j.id)}" title="${titulo}">${contenido}</a>`
+        ? `<a class="ficha ${claseProbabilidad(j.prob)}" href="/jugador/${enc(j.id)}" title="${titulo}">${contenido}</a>`
         : `<span class="ficha ${claseProbabilidad(j.prob)}" title="${titulo}">${contenido}</span>`;
     }).join('')}</div>`;
   }).join('')}</div>`;
@@ -253,15 +253,15 @@ function htmlComparativa(lista, conFF) {
   const filas = lista.filter((x) => x.prob >= 0.05 || x.aviso).slice(0, 18).map((x) => {
     const discrepa = x.ff != null && x.propia != null && Math.abs(x.ff - x.propia) >= 0.35;
     return `<tr>
-      <td class="izq">${esc(x.nombre)} ${x.aviso ? htmlEstadoFantasy(x.estado) : ''}${discrepa ? ' <span class="discrepa" title="Las fuentes no coinciden">⚠️</span>' : ''}</td>
+      <td class="izq">${esc(x.nombre)} ${x.aviso ? htmlEstadoFantasy(x.estado) : ''}${discrepa ? ` <span class="discrepa" title="${L('Las fuentes no coinciden', 'Sources disagree')}">⚠️</span>` : ''}</td>
       ${conFF ? celdaPct(x.ff) : ''}${celdaPct(x.propia)}
       <td class="pts"><span class="pct ${claseProbabilidad(x.prob)}">${pct(x.prob)}</span></td>
     </tr>`;
   }).join('');
   return `<details class="tabla-fuentes" ${conFF ? 'open' : ''}>
-    <summary class="sub-cab" style="cursor:pointer">Comparativa de fuentes</summary>
+    <summary class="sub-cab" style="cursor:pointer">${L('Comparativa de fuentes', 'Source comparison')}</summary>
     <div class="tabla-scroll"><table>
-      <thead><tr><th class="izq">Jugador</th>${conFF ? '<th title="Futbol Fantasy">F. Fantasy</th>' : ''}<th title="Calculado con las últimas alineaciones">Mi cálculo</th><th>Final</th></tr></thead>
+      <thead><tr><th class="izq">${L('Jugador', 'Player')}</th>${conFF ? '<th title="Futbol Fantasy">F. Fantasy</th>' : ''}<th title="${L('Calculado con las últimas alineaciones', 'Based on recent line-ups')}">${L('Mi cálculo', 'My model')}</th><th>${L('Final', 'Final')}</th></tr></thead>
       <tbody>${filas}</tbody>
     </table></div>
   </details>`;
@@ -289,10 +289,10 @@ function alineacionOficial(d) {
 async function htmlPosibleOnce(ligaId, p, d) {
   const oficial = alineacionOficial(d);
   if (oficial) {
-    return `<div class="fuentes"><span class="fuente activa">ESPN · alineación oficial</span></div>
+    return `<div class="fuentes"><span class="fuente activa">ESPN · ${L('alineación oficial', 'official line-up')}</span></div>
       <div class="dos-columnas">${oficial.map((o) => `<section class="tarjeta">
         <div class="bloque-cab"><span class="celda-equipo">${escudo(o.equipo?.logo || o.equipo?.logos?.[0]?.href)}${esc(o.equipo?.displayName)}</span><small>${esc(o.formacion || '')}</small></div>
-        <div class="aviso-oficial">✅ Alineación oficial confirmada</div>
+        <div class="aviso-oficial">✅ ${L('Alineación oficial confirmada', 'Official line-up confirmed')}</div>
         ${htmlCampo(o.once)}
       </section>`).join('')}</div>`;
   }
@@ -305,39 +305,41 @@ async function htmlPosibleOnce(ligaId, p, d) {
   const datosFF = window.DATOS_ALINEACIONES;
 
   const fuentes = `<div class="fuentes">
-      <span class="fuente activa">Mi cálculo · últimos 5 partidos</span>
-      ${esLaLiga ? `<span class="fuente ${algunoFF ? 'activa' : ''}">Futbol Fantasy${datosFF?.actualizado ? ` · ${esc(haceTiempo(datosFF.actualizado).toLowerCase())}` : ''}${algunoFF ? '' : ' · sin datos de este partido'}</span>
-        <span class="fuente ${algunoFantasy ? 'activa' : ''}">LaLiga Fantasy · bajas oficiales</span>` : ''}
-      <span class="fuente">ESPN · once oficial (≈1 h antes)</span>
+      <span class="fuente activa">${L('Mi cálculo · últimos 5 partidos', 'My model · last 5 matches')}</span>
+      ${esLaLiga ? `<span class="fuente ${algunoFF ? 'activa' : ''}">Futbol Fantasy${datosFF?.actualizado ? ` · ${esc(haceTiempo(datosFF.actualizado).toLowerCase())}` : ''}${algunoFF ? '' : L(' · sin datos de este partido', ' · no data for this match')}</span>
+        <span class="fuente ${algunoFantasy ? 'activa' : ''}">LaLiga Fantasy · ${L('bajas oficiales', 'official absences')}</span>` : ''}
+      <span class="fuente">ESPN · ${L('once oficial (≈1 h antes)', 'official XI (≈1 h before)')}</span>
     </div>`;
 
   const bloques = resultados.map((r, i) => {
     const eq = equipos[i];
     if (r.status !== 'fulfilled' || r.value.once.length < 11) {
       return `<section class="tarjeta"><div class="bloque-cab"><span class="celda-equipo">${escudo(eq.logo)}${esc(eq.nombreLargo)}</span></div>
-        <p class="vacio">No hay suficientes datos para calcular su posible 11.</p></section>`;
+        <p class="vacio">${L('No hay suficientes datos para calcular su posible 11.', 'Not enough data to predict this line-up.')}</p></section>`;
     }
     const { once, lista, formacion, partidosAnalizados, ff, bajas } = r.value;
     return `<section class="tarjeta">
       <div class="bloque-cab"><span class="celda-equipo">${escudo(eq.logo)}${esc(eq.nombreLargo)}</span><small>${esc(formacion)}</small></div>
       ${htmlCampo(once)}
       ${htmlComparativa(lista, !!ff)}
-      ${bajas.length ? `<div class="sub-cab">Bajas y dudas (LaLiga Fantasy)</div>
+      ${bajas.length ? `<div class="sub-cab">${L('Bajas y dudas (LaLiga Fantasy)', 'Absences and doubts (LaLiga Fantasy)')}</div>
         <div class="lista-jugadores">${bajas.map((j) => filaJugadorFantasy(j)).join('')}</div>` : ''}
-      <p class="nota relleno" style="margin:0">Mi cálculo usa ${partidosAnalizados} ${partidosAnalizados === 1 ? 'partido' : 'partidos'} recientes.
-        ${ff ? `<a href="${urlSegura(ff.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--acento)">Ver en Futbol Fantasy ›</a>` : ''}</p>
+      <p class="nota relleno" style="margin:0">${L(`Mi cálculo usa ${partidosAnalizados} ${partidosAnalizados === 1 ? 'partido' : 'partidos'} recientes.`, `My model uses ${partidosAnalizados} recent ${partidosAnalizados === 1 ? 'match' : 'matches'}.`)}
+        ${ff ? `<a href="${urlSegura(ff.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--acento)">${L('Ver en Futbol Fantasy', 'See on Futbol Fantasy')} ›</a>` : ''}</p>
     </section>`;
   }).join('');
 
-  return `<p class="nota">📊 El porcentaje es la probabilidad de ser titular. ${esLaLiga
-      ? `Combina el de <b>Futbol Fantasy</b> (${Math.round(PESO_FUTBOL_FANTASY * 100)}%, tiene en cuenta entrenamientos y ruedas de prensa) con <b>mi cálculo</b> a partir de las últimas alineaciones (${Math.round((1 - PESO_FUTBOL_FANTASY) * 100)}%), y aplica las bajas oficiales de LaLiga Fantasy. ⚠️ indica que las fuentes no coinciden.`
-      : 'Se calcula con las alineaciones de los últimos 5 partidos oficiales (los más recientes pesan más).'}
-      No es una alineación oficial.</p>
+  const pesoFF = Math.round(PESO_FUTBOL_FANTASY * 100);
+  return `<p class="nota">📊 ${L('El porcentaje es la probabilidad de ser titular.', 'The percentage is the probability of starting.')} ${esLaLiga
+      ? L(`Combina el de <b>Futbol Fantasy</b> (${pesoFF}%, tiene en cuenta entrenamientos y ruedas de prensa) con <b>mi cálculo</b> a partir de las últimas alineaciones (${100 - pesoFF}%), y aplica las bajas oficiales de LaLiga Fantasy. ⚠️ indica que las fuentes no coinciden.`,
+        `It blends <b>Futbol Fantasy</b> (${pesoFF}%, which accounts for training and press conferences) with <b>my model</b> based on recent line-ups (${100 - pesoFF}%), and applies official LaLiga Fantasy absences. ⚠️ means the sources disagree.`)
+      : L('Se calcula con las alineaciones de los últimos 5 partidos oficiales (los más recientes pesan más).', 'It is based on the line-ups of the last 5 official matches (recent ones weigh more).')}
+      ${L('No es una alineación oficial.', 'This is not an official line-up.')}</p>
     ${fuentes}
     <div class="leyenda" style="padding:0 0 12px">
-      <span><i style="background:#22c55e"></i>75% o más</span>
+      <span><i style="background:#22c55e"></i>${L('75% o más', '75% or more')}</span>
       <span><i style="background:#f59e0b"></i>50–74%</span>
-      <span><i style="background:#ef4444"></i>Menos del 50%</span>
+      <span><i style="background:#ef4444"></i>${L('Menos del 50%', 'Under 50%')}</span>
     </div>
     <div class="dos-columnas">${bloques}</div>`;
 }

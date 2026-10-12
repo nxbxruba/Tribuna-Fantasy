@@ -1,0 +1,163 @@
+{
+  "dominio": "https://infofut-fantasy.pages.dev",
+  "rutas": [
+    {
+      "ruta": "/",
+      "prioridad": "1.0",
+      "es": {
+        "titulo": "InfoFut Fantasy: resultados en directo, posible 11, fichajes y Fantasy LaLiga",
+        "descripcion": "Resultados de fútbol en directo, clasificaciones, posible 11 comparando fuentes, últimos fichajes y Fantasy de LaLiga con valores oficiales.",
+        "h1": "InfoFut Fantasy",
+        "texto": "Resultados de fútbol en directo de LaLiga, Premier League, Champions y más ligas; posible 11 comparando fuentes; últimos fichajes y rumores; y Fantasy de LaLiga con valores oficiales, subidas, bajadas y chollos."
+      },
+      "en": {
+        "titulo": "InfoFut Fantasy: live scores, predicted line-ups, transfers and LaLiga Fantasy",
+        "descripcion": "Live football scores, standings, predicted line-ups comparing sources, latest transfers and LaLiga Fantasy with official market values.",
+        "h1": "InfoFut Fantasy",
+        "texto": "Live football scores from LaLiga, the Premier League, the Champions League and more; predicted line-ups comparing sources; latest transfers and rumours; and LaLiga Fantasy with official values, risers, fallers and bargains."
+      }
+    },
+    {
+      "ruta": "/fantasy",
+      "prioridad": "0.9",
+      "es": {
+        "titulo": "Fantasy LaLiga: subidas y bajadas de valor hoy",
+        "descripcion": "Qué jugadores suben y bajan de valor en LaLiga Fantasy hoy y en los últimos 3, 7 y 30 días, con datos oficiales actualizados cada 3 horas."
+      },
+      "en": {
+        "titulo": "LaLiga Fantasy: today's biggest risers and fallers",
+        "descripcion": "Which players are rising and falling in value in LaLiga Fantasy today and over the last 3, 7 and 30 days, with official data updated every 3 hours."
+      }
+    },
+    {
+      "ruta": "/fantasy/jugadores",
+      "prioridad": "0.8",
+      "es": {
+        "titulo": "Precios de jugadores de LaLiga Fantasy",
+        "descripcion": "Valor de mercado oficial de todos los jugadores de LaLiga Fantasy: busca por nombre, equipo o posición y ordena por precio, puntos, media o titularidad."
+      },
+      "en": {
+        "titulo": "LaLiga Fantasy player prices",
+        "descripcion": "Official market value of every LaLiga Fantasy player: search by name, team or position and sort by price, points, average or chance of starting."
+      }
+    },
+    {
+      "ruta": "/fantasy/once",
+      "prioridad": "0.7",
+      "es": {
+        "titulo": "Once ideal, chollos y jugadores en forma de LaLiga Fantasy",
+        "descripcion": "El once ideal de LaLiga Fantasy por puntos, los mejores chollos por puntos por millón y los jugadores más en forma."
+      },
+      "en": {
+        "titulo": "LaLiga Fantasy best XI, bargains and in-form players",
+        "descripcion": "The LaLiga Fantasy best XI by points, the best bargains by points per million and the most in-form players."
+      }
+    },
+    {
+      "ruta": "/fantasy/lesionados",
+      "prioridad": "0.7",
+      "es": {
+        "titulo": "Lesionados, dudas y sancionados de LaLiga Fantasy",
+        "descripcion": "Parte médico de LaLiga: jugadores lesionados, en duda y sancionados de cada equipo, según LaLiga Fantasy."
+      },
+      "en": {
+        "titulo": "LaLiga Fantasy injuries, doubts and suspensions",
+        "descripcion": "LaLiga injury report: injured, doubtful and suspended players for every team, according to LaLiga Fantasy."
+      }
+    },
+    {
+      "ruta": "/fichajes",
+      "prioridad": "0.8",
+      "es": {
+        "titulo": "Última hora del mercado de fichajes de LaLiga",
+        "descripcion": "Fichajes oficiales, acuerdos, negociaciones y rumores de LaLiga, actualizados cada 3 horas."
+      },
+      "en": {
+        "titulo": "LaLiga transfer news: latest market updates",
+        "descripcion": "Official signings, agreements, negotiations and rumours in LaLiga, updated every 3 hours."
+      }
+    },
+    {
+      "ruta": "/fichajes/ultimos",
+      "prioridad": "0.7",
+      "es": {
+        "titulo": "Últimos fichajes de LaLiga, Premier League y más ligas",
+        "descripcion": "Los últimos traspasos, cesiones y fichajes libres de 17 ligas, con el club de origen, el de destino y la cantidad."
+      },
+      "en": {
+        "titulo": "Latest transfers in LaLiga, the Premier League and more",
+        "descripcion": "The latest transfers, loans and free signings in 17 leagues, with the selling club, the buying club and the fee."
+      }
+    },
+    {
+      "ruta": "/fichajes/rumores",
+      "prioridad": "0.6",
+      "es": {
+        "titulo": "Rumores de fichajes",
+        "descripcion": "Los rumores de fichajes más recientes: club actual, club interesado y probabilidad."
+      },
+      "en": {
+        "titulo": "Transfer rumours",
+        "descripcion": "The latest transfer rumours: current club, interested club and probability."
+      }
+    },
+    {
+      "ruta": "/fichajes/noticias",
+      "prioridad": "0.6",
+      "es": {
+        "titulo": "Noticias de fichajes",
+        "descripcion": "Noticias sobre fichajes, traspasos, cesiones y renovaciones."
+      },
+      "en": {
+        "titulo": "Transfer news",
+        "descripcion": "News about signings, transfers, loans and contract extensions."
+      }
+    },
+    {
+      "ruta": "/noticias",
+      "prioridad": "0.6",
+      "es": {
+        "titulo": "Noticias de fútbol",
+        "descripcion": "Las últimas noticias de LaLiga, la Premier League, la Champions League y más competiciones."
+      },
+      "en": {
+        "titulo": "Football news",
+        "descripcion": "The latest news from LaLiga, the Premier League, the Champions League and more competitions."
+      }
+    },
+    {
+      "ruta": "/ligas",
+      "prioridad": "0.6",
+      "es": {
+        "titulo": "Ligas y competiciones de fútbol",
+        "descripcion": "Todas las ligas y competiciones: LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Champions League, Liga MX, MLS y más."
+      },
+      "en": {
+        "titulo": "Football leagues and competitions",
+        "descripcion": "All leagues and competitions: LaLiga, the Premier League, Serie A, the Bundesliga, Ligue 1, the Champions League, Liga MX, MLS and more."
+      }
+    }
+  ],
+  "plantillasLiga": {
+    "partidos": {
+      "es": { "titulo": "{liga}: partidos y resultados en directo", "descripcion": "Partidos, resultados en directo y calendario de {liga} ({pais})." },
+      "en": { "titulo": "{liga}: fixtures and live scores", "descripcion": "{liga} ({pais}) fixtures, live scores and results." }
+    },
+    "clasificacion": {
+      "es": { "titulo": "Clasificación de {liga}", "descripcion": "Clasificación actualizada de {liga} ({pais}): puntos, partidos jugados, goles y diferencia de goles." },
+      "en": { "titulo": "{liga} standings", "descripcion": "Up-to-date {liga} ({pais}) table: points, games played, goals and goal difference." }
+    },
+    "goleadores": {
+      "es": { "titulo": "Máximos goleadores de {liga}", "descripcion": "Máximos goleadores y asistentes de {liga} ({pais}) esta temporada." },
+      "en": { "titulo": "{liga} top scorers", "descripcion": "{liga} ({pais}) top scorers and assist leaders this season." }
+    },
+    "equipos": {
+      "es": { "titulo": "Equipos de {liga}", "descripcion": "Todos los equipos de {liga} ({pais}): resultados, calendario y plantillas." },
+      "en": { "titulo": "{liga} teams", "descripcion": "Every {liga} ({pais}) team: results, fixtures and squads." }
+    },
+    "noticias": {
+      "es": { "titulo": "Noticias de {liga}", "descripcion": "Las últimas noticias de {liga} ({pais})." },
+      "en": { "titulo": "{liga} news", "descripcion": "The latest {liga} ({pais}) news." }
+    }
+  }
+}

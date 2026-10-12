@@ -5,11 +5,11 @@
    ========================================================= */
 async function vistaLigas() {
   return {
-    html: `<h1 class="titulo-seccion">Ligas y competiciones</h1>
+    html: `<h1 class="titulo-seccion">${L('Ligas y competiciones', 'Leagues and competitions')}</h1>
       ${GRUPOS_LIGAS.map((g) => `<section class="grupo-ligas">
-        <h2 class="titulo-seccion" style="font-size:15px">${esc(g.nombre)}</h2>
-        <div class="rejilla">${g.ligas.map((l) =>
-          `<a class="casilla" href="#/liga/${l.id}/partidos"><span class="icono-grande">🏆</span>${esc(l.nombre)}<small>${esc(l.pais)}</small></a>`).join('')}
+        <h2 class="titulo-seccion" style="font-size:15px">${esc(nombreGrupo(g))}</h2>
+        <div class="rejilla">${g.ligas.map((l) => buscarLiga(l.id)).map((l) =>
+          `<a class="casilla" href="/liga/${l.id}/partidos"><span class="icono-grande">🏆</span>${esc(l.nombre)}<small>${esc(l.pais)}</small></a>`).join('')}
         </div>
       </section>`).join('')}`,
   };
@@ -21,10 +21,10 @@ async function vistaLigas() {
 async function vistaNoticias() {
   const noticias = await cargarNoticias(LIGAS_NOTICIAS, 10);
   return {
-    html: `<h1 class="titulo-seccion">Noticias</h1>
+    html: `<h1 class="titulo-seccion">${L('Noticias', 'News')}</h1>
       ${noticias.length
         ? `<div class="noticias-rejilla">${noticias.slice(0, 36).map((a) => tarjetaNoticia(a)).join('')}</div>`
-        : vacio('No hay noticias ahora mismo.', '📰')}`,
+        : vacio(L('No hay noticias ahora mismo.', 'No news right now.'), '📰')}`,
   };
 }
 
@@ -32,11 +32,11 @@ async function vistaNoticias() {
    VISTA: LIGA (partidos, clasificación, goleadores, equipos, noticias)
    ========================================================= */
 const PESTANAS_LIGA = [
-  ['partidos', 'Partidos'],
-  ['clasificacion', 'Clasificación'],
-  ['goleadores', 'Goleadores'],
-  ['equipos', 'Equipos'],
-  ['noticias', 'Noticias'],
+  ['partidos', L('Partidos', 'Fixtures')],
+  ['clasificacion', L('Clasificación', 'Standings')],
+  ['goleadores', L('Goleadores', 'Top scorers')],
+  ['equipos', L('Equipos', 'Teams')],
+  ['noticias', L('Noticias', 'News')],
 ];
 
 async function vistaLiga(id, pestana, params) {
@@ -56,7 +56,7 @@ async function vistaLiga(id, pestana, params) {
     html: `<header class="cab-pagina"><div>
         <p class="cab-sub">${esc(liga.pais)}</p><h1>${esc(liga.nombre)}</h1>
       </div></header>
-      ${pestanas(PESTANAS_LIGA, pestana, `#/liga/${liga.id}/`)}
+      ${pestanas(PESTANAS_LIGA, pestana, `/liga/${liga.id}/`)}
       ${html}`,
   };
 }
@@ -95,9 +95,9 @@ function navegacionJornada(rutaBase, inicio, fin, desde) {
   const union = rutaBase.includes('?') ? '&' : '?';
   const rangoTexto = mismoDia(inicio, fin) ? fmtDiaCorto(inicio) : `${fmtFechaCorta(inicio)} – ${fmtFechaCorta(fin)}`;
   return `<div class="nav-semana">
-    <a class="boton" href="${rutaBase}${union}desde=${ymd(sumarDias(inicio, -7))}">‹ Antes</a>
-    <span>${esc(rangoTexto)}${desde ? `<a href="${rutaBase}">Volver a la jornada actual</a>` : ''}</span>
-    <a class="boton" href="${rutaBase}${union}desde=${ymd(sumarDias(fin, 1))}">Después ›</a>
+    <a class="boton" href="${rutaBase}${union}desde=${ymd(sumarDias(inicio, -7))}">‹ ${L('Antes', 'Earlier')}</a>
+    <span>${esc(rangoTexto)}${desde ? `<a href="${rutaBase}">${L('Volver a la jornada actual', 'Back to current round')}</a>` : ''}</span>
+    <a class="boton" href="${rutaBase}${union}desde=${ymd(sumarDias(fin, 1))}">${L('Después', 'Later')} ›</a>
   </div>`;
 }
 
@@ -112,7 +112,7 @@ async function ligaPartidos(liga, params) {
     porDia.get(clave).push(p);
   }
 
-  const navegacion = navegacionJornada(`#/liga/${liga.id}/partidos`, inicio, fin, desde);
+  const navegacion = navegacionJornada(`/liga/${liga.id}/partidos`, inicio, fin, desde);
 
   const secciones = [...porDia.values()].map((lista) => `<section class="tarjeta">
       <h2 class="cab-dia capital">${esc(fmtDiaLargo(lista[0].fecha))}</h2>
@@ -120,7 +120,7 @@ async function ligaPartidos(liga, params) {
     </section>`).join('');
 
   return {
-    html: navegacion + (secciones || vacio('No hay partidos en estas fechas.', '📅')),
+    html: navegacion + (secciones || vacio(L('No hay partidos en estas fechas.', 'No matches on these dates.'), '📅')),
     vivo: partidos.some((p) => p.estado === 'in'),
   };
 }
@@ -128,7 +128,7 @@ async function ligaPartidos(liga, params) {
 async function ligaClasificacion(liga) {
   const d = await pedir(`${API_CLASIFICACION}/${liga.id}/standings?${IDIOMA}`, 120000);
   const grupos = d.children?.length ? d.children : d.standings ? [d] : [];
-  if (!grupos.length) return { html: vacio('Clasificación no disponible para esta competición.', '📊') };
+  if (!grupos.length) return { html: vacio(L('Clasificación no disponible para esta competición.', 'Standings not available for this competition.'), '📊') };
 
   const leyenda = new Map();
   const tablas = grupos.map((g) => {
@@ -143,7 +143,7 @@ async function ligaClasificacion(liga) {
       const fav = favoritos.es(en.team?.id) ? ' <span class="fav-marca">★</span>' : '';
       return `<tr>
         <td class="pos" style="${color ? `box-shadow: inset 4px 0 0 ${color}` : ''}">${orden}</td>
-        <td class="izq"><a class="celda-equipo" href="#/equipo/${liga.id}/${enc(en.team?.id)}">
+        <td class="izq"><a class="celda-equipo" href="/equipo/${liga.id}/${enc(en.team?.id)}">
           ${escudo(en.team?.logos?.[0]?.href)}<span>${esc(en.team?.shortDisplayName || en.team?.displayName)}${fav}</span></a></td>
         <td>${esc(s.gamesPlayed)}</td><td>${esc(s.wins)}</td><td>${esc(s.ties)}</td><td>${esc(s.losses)}</td>
         <td class="opc">${esc(s.pointsFor)}</td><td class="opc">${esc(s.pointsAgainst)}</td>
@@ -151,12 +151,15 @@ async function ligaClasificacion(liga) {
       </tr>`;
     }).join('');
 
+    const cab = EN
+      ? `<th>#</th><th class="izq">Team</th><th title="Played">P</th><th title="Won">W</th><th title="Drawn">D</th><th title="Lost">L</th>
+         <th class="opc" title="Goals for">GF</th><th class="opc" title="Goals against">GA</th><th title="Goal difference">GD</th><th>Pts</th>`
+      : `<th>#</th><th class="izq">Equipo</th><th title="Partidos jugados">PJ</th><th title="Ganados">G</th><th title="Empatados">E</th><th title="Perdidos">P</th>
+         <th class="opc" title="Goles a favor">GF</th><th class="opc" title="Goles en contra">GC</th><th title="Diferencia de goles">DG</th><th>Pts</th>`;
     return `<section class="tarjeta">
       ${grupos.length > 1 ? `<h2 class="cab-dia">${esc(g.name)}</h2>` : ''}
       <div class="tabla-scroll"><table>
-        <thead><tr><th>#</th><th class="izq">Equipo</th><th title="Partidos jugados">PJ</th><th title="Ganados">G</th>
-          <th title="Empatados">E</th><th title="Perdidos">P</th><th class="opc" title="Goles a favor">GF</th>
-          <th class="opc" title="Goles en contra">GC</th><th title="Diferencia de goles">DG</th><th>Pts</th></tr></thead>
+        <thead><tr>${cab}</tr></thead>
         <tbody>${cuerpo}</tbody>
       </table></div>
     </section>`;
@@ -170,7 +173,10 @@ async function ligaClasificacion(liga) {
 
 async function ligaGoleadores(liga) {
   const d = await pedir(`${API}/${liga.id}/statistics?${IDIOMA}`, 300000);
-  const titulos = { goalsLeaders: ['Máximos goleadores', 'Goles'], assistsLeaders: ['Máximos asistentes', 'Asist.'] };
+  const titulos = {
+    goalsLeaders: [L('Máximos goleadores', 'Top scorers'), L('Goles', 'Goals')],
+    assistsLeaders: [L('Máximos asistentes', 'Top assists'), L('Asist.', 'Ast.')],
+  };
   const tablas = (d.stats || []).filter((c) => titulos[c.name] && c.leaders?.length).map((c) => {
     const [titulo, columna] = titulos[c.name];
     const filas = c.leaders.slice(0, 20).map((l, i) => {
@@ -180,7 +186,7 @@ async function ligaGoleadores(liga) {
       const equipo = a.team || {};
       return `<tr>
         <td class="pos">${i + 1}</td>
-        <td class="izq"><a class="celda-equipo" href="#/jugador/${enc(a.id)}">
+        <td class="izq"><a class="celda-equipo" href="/jugador/${enc(a.id)}">
           ${escudo(equipo.logos?.[0]?.href)}<span>${esc(a.displayName)}<small>${esc(equipo.displayName || '')}</small></span></a></td>
         <td>${esc(partidos)}</td>
         <td class="pts">${esc(l.value ?? '')}</td>
@@ -189,22 +195,22 @@ async function ligaGoleadores(liga) {
     return `<section class="tarjeta">
       <h2 class="cab-dia">${esc(titulo)}</h2>
       <div class="tabla-scroll"><table>
-        <thead><tr><th>#</th><th class="izq">Jugador</th><th title="Partidos jugados">PJ</th><th>${esc(columna)}</th></tr></thead>
+        <thead><tr><th>#</th><th class="izq">${L('Jugador', 'Player')}</th><th title="${L('Partidos jugados', 'Appearances')}">${L('PJ', 'Apps')}</th><th>${esc(columna)}</th></tr></thead>
         <tbody>${filas}</tbody>
       </table></div>
     </section>`;
   }).join('');
-  return { html: tablas || vacio('Estadísticas no disponibles para esta competición.', '📊') };
+  return { html: tablas || vacio(L('Estadísticas no disponibles para esta competición.', 'Stats not available for this competition.'), '📊') };
 }
 
 async function ligaEquipos(liga) {
   const d = await pedir(`${API}/${liga.id}/teams?${IDIOMA}`, 3600000);
   const equipos = (d.sports?.[0]?.leagues?.[0]?.teams || []).map((t) => t.team)
-    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'es'));
-  if (!equipos.length) return { html: vacio('No hay equipos disponibles.') };
+    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', LOCALE));
+  if (!equipos.length) return { html: vacio(L('No hay equipos disponibles.', 'No teams available.')) };
   return {
     html: `<div class="rejilla">${equipos.map((t) =>
-      `<a class="casilla" href="#/equipo/${liga.id}/${enc(t.id)}">${escudo(t.logos?.[0]?.href)}${esc(t.displayName)}${favoritos.es(t.id) ? '<small>★ Favorito</small>' : ''}</a>`).join('')}</div>`,
+      `<a class="casilla" href="/equipo/${liga.id}/${enc(t.id)}">${escudo(t.logos?.[0]?.href)}${esc(t.displayName)}${favoritos.es(t.id) ? `<small>★ ${L('Favorito', 'Favourite')}</small>` : ''}</a>`).join('')}</div>`,
   };
 }
 
@@ -213,15 +219,20 @@ async function ligaNoticias(liga) {
   return {
     html: noticias.length
       ? `<div class="noticias-rejilla">${noticias.map((a) => tarjetaNoticia(a)).join('')}</div>`
-      : vacio('No hay noticias de esta competición.', '📰'),
+      : vacio(L('No hay noticias de esta competición.', 'No news for this competition.'), '📰'),
   };
 }
 
 /* =========================================================
    VISTA: EQUIPO (resultados, próximos partidos, plantilla)
    ========================================================= */
-const PESTANAS_EQUIPO = [['resultados', 'Resultados'], ['proximos', 'Próximos'], ['plantilla', 'Plantilla']];
-const POSICIONES = { Goalkeeper: 'Porteros', Defender: 'Defensas', Midfielder: 'Centrocampistas', Forward: 'Delanteros' };
+const PESTANAS_EQUIPO = [['resultados', L('Resultados', 'Results')], ['proximos', L('Próximos', 'Fixtures')], ['plantilla', L('Plantilla', 'Squad')]];
+const POSICIONES = {
+  Goalkeeper: L('Porteros', 'Goalkeepers'),
+  Defender: L('Defensas', 'Defenders'),
+  Midfielder: L('Centrocampistas', 'Midfielders'),
+  Forward: L('Delanteros', 'Forwards'),
+};
 
 async function vistaEquipo(ligaId, id, pestana) {
   if (!PESTANAS_EQUIPO.some(([p]) => p === pestana)) return vistaNoEncontrada();
@@ -235,18 +246,18 @@ async function vistaEquipo(ligaId, id, pestana) {
     const d = await pedir(`${base}/roster?${IDIOMA}`, 3600000);
     const grupos = new Map(Object.values(POSICIONES).map((n) => [n, []]));
     for (const j of d.athletes || []) {
-      const pos = POSICIONES[j.position?.name] || 'Otros';
+      const pos = POSICIONES[j.position?.name] || L('Otros', 'Others');
       if (!grupos.has(pos)) grupos.set(pos, []);
       grupos.get(pos).push(j);
     }
     contenido = [...grupos].filter(([, js]) => js.length).map(([pos, js]) => `<section class="tarjeta">
       <div class="sub-cab">${esc(pos)}</div>
-      <div class="lista-jugadores">${js.map((j) => `<a href="#/jugador/${enc(j.id)}">
+      <div class="lista-jugadores">${js.map((j) => `<a href="/jugador/${enc(j.id)}">
         <span class="dorsal">${esc(j.jersey || '')}</span>
         ${urlSegura(j.flag?.href) ? `<img class="bandera" src="${urlSegura(j.flag.href)}" alt="" loading="lazy">` : ''}
-        <span class="nombre">${esc(j.displayName)}<br><small>${esc([j.citizenship, j.age ? `${j.age} años` : ''].filter(Boolean).join(' · '))}</small></span>
+        <span class="nombre">${esc(j.displayName)}<br><small>${esc([j.citizenship, j.age ? L(`${j.age} años`, `${j.age} years`) : ''].filter(Boolean).join(' · '))}</small></span>
       </a>`).join('')}</div>
-    </section>`).join('') || vacio('Plantilla no disponible.');
+    </section>`).join('') || vacio(L('Plantilla no disponible.', 'Squad not available.'));
   } else {
     // Todas las competiciones del equipo (liga, copa, Europa...), sin amistosos
     const proximos = pestana === 'proximos';
@@ -259,21 +270,22 @@ async function vistaEquipo(ligaId, id, pestana) {
       .sort((a, b) => (proximos ? a.fecha - b.fecha : b.fecha - a.fecha));
     contenido = partidos.length
       ? `<section class="tarjeta">${partidos.map((p) => filaPartido(p, true)).join('')}</section>`
-      : vacio(proximos ? 'No hay próximos partidos programados.' : 'Todavía no hay resultados esta temporada.', '📅');
+      : vacio(proximos ? L('No hay próximos partidos programados.', 'No upcoming matches scheduled.') : L('Todavía no hay resultados esta temporada.', 'No results yet this season.'), '📅');
   }
 
   const color = colorSeguro(t.color);
   const balance = t.record?.items?.[0]?.summary?.split('-'); // formato G-E-P
   const cifras = [
     t.standingSummary,
-    balance?.length === 3 ? `${balance[0]} G · ${balance[1]} E · ${balance[2]} P` : '',
+    balance?.length === 3 ? (EN ? `${balance[0]} W · ${balance[1]} D · ${balance[2]} L` : `${balance[0]} G · ${balance[1]} E · ${balance[2]} P`) : '',
   ].filter(Boolean);
   const datosFavorito = { id: String(t.id), liga: ligaId, nombre: t.shortDisplayName || t.displayName, logo: t.logos?.[0]?.href };
   const esFav = favoritos.es(t.id);
+  const textoBoton = (fav) => (fav ? `★ ${L('Favorito', 'Favourite')}` : `☆ ${L('Seguir', 'Follow')}`);
 
   return {
     html: `<header class="cab-equipo" style="${color ? `--color-equipo:${color}` : ''}">
-        <button type="button" class="boton-favorito ${esFav ? 'activo' : ''}" data-accion="favorito">${esFav ? '★ Favorito' : '☆ Seguir'}</button>
+        <button type="button" class="boton-favorito ${esFav ? 'activo' : ''}" data-accion="favorito">${textoBoton(esFav)}</button>
         <div class="cab-pagina" style="margin:0">
           ${escudo(t.logos?.[0]?.href, 'escudo-grande')}
           <div>
@@ -283,15 +295,19 @@ async function vistaEquipo(ligaId, id, pestana) {
           </div>
         </div>
       </header>
-      ${pestanas(PESTANAS_EQUIPO, pestana, `#/equipo/${enc(ligaId)}/${enc(id)}/`)}
+      ${pestanas(PESTANAS_EQUIPO, pestana, `/equipo/${enc(ligaId)}/${enc(id)}/`)}
       ${contenido}`,
+    titulo: L(`${t.displayName}: resultados, calendario y plantilla`, `${t.displayName}: results, fixtures and squad`),
+    descripcion: L(`Resultados, próximos partidos y plantilla de ${t.displayName}.`, `${t.displayName} results, upcoming fixtures and squad.`),
     alMontar() {
       const boton = app.querySelector('[data-accion="favorito"]');
       boton?.addEventListener('click', () => {
         const ahora = favoritos.alternar(datosFavorito);
         boton.classList.toggle('activo', ahora);
-        boton.textContent = ahora ? '★ Favorito' : '☆ Seguir';
-        avisar(ahora ? `${datosFavorito.nombre} añadido a tus equipos` : `${datosFavorito.nombre} quitado de tus equipos`);
+        boton.textContent = textoBoton(ahora);
+        avisar(ahora
+          ? L(`${datosFavorito.nombre} añadido a tus equipos`, `${datosFavorito.nombre} added to your teams`)
+          : L(`${datosFavorito.nombre} quitado de tus equipos`, `${datosFavorito.nombre} removed from your teams`));
       });
     },
   };
@@ -304,9 +320,9 @@ async function vistaFavoritos() {
   const lista = favoritos.lista();
   if (!lista.length) {
     return {
-      html: `<h1 class="titulo-seccion">⭐ Mis equipos</h1>
-        ${vacio('Todavía no sigues a ningún equipo. Entra en un equipo y pulsa "☆ Seguir".', '⭐')}
-        <p style="text-align:center"><a class="boton principal" href="#/ligas">Explorar ligas</a></p>`,
+      html: `<h1 class="titulo-seccion">⭐ ${L('Mis equipos', 'My teams')}</h1>
+        ${vacio(L('Todavía no sigues a ningún equipo. Entra en un equipo y pulsa "☆ Seguir".', 'You are not following any team yet. Open a team and tap "☆ Follow".'), '⭐')}
+        <p style="text-align:center"><a class="boton principal" href="/ligas">${L('Explorar ligas', 'Browse leagues')}</a></p>`,
     };
   }
   const calendarios = await Promise.allSettled(lista.map((f) =>
@@ -322,23 +338,26 @@ async function vistaFavoritos() {
     const proximo = sacar(calendarios[i], (p) => p.estado !== 'post', porFecha);
     const ultimo = sacar(resultados[i], (p) => p.estado === 'post', (a, b) => b.fecha - a.fecha);
     return `<section class="tarjeta">
-      <a class="bloque-cab" href="#/equipo/${enc(f.liga)}/${enc(f.id)}"><span class="celda-equipo">${escudo(f.logo)}${esc(f.nombre)}</span><small>Ver equipo ›</small></a>
-      ${ultimo ? `<div class="sub-cab">Último partido</div>${filaPartido(ultimo, true)}` : ''}
-      ${proximo ? `<div class="sub-cab">Próximo partido</div>${filaPartido(proximo, true)}` : ''}
+      <a class="bloque-cab" href="/equipo/${enc(f.liga)}/${enc(f.id)}"><span class="celda-equipo">${escudo(f.logo)}${esc(f.nombre)}</span><small>${L('Ver equipo', 'View team')} ›</small></a>
+      ${ultimo ? `<div class="sub-cab">${L('Último partido', 'Last match')}</div>${filaPartido(ultimo, true)}` : ''}
+      ${proximo ? `<div class="sub-cab">${L('Próximo partido', 'Next match')}</div>${filaPartido(proximo, true)}` : ''}
     </section>`;
   }).join('');
 
-  return { html: `<h1 class="titulo-seccion">⭐ Mis equipos</h1><div class="dos-columnas">${tarjetas}</div>` };
+  return { html: `<h1 class="titulo-seccion">⭐ ${L('Mis equipos', 'My teams')}</h1><div class="dos-columnas">${tarjetas}</div>` };
 }
 
 /* =========================================================
    VISTAS DE ERROR
    ========================================================= */
 async function vistaNoEncontrada() {
-  return { html: `${vacio('Esta página no existe.', '🤷')}<p style="text-align:center"><a class="boton" href="#/">Ir al inicio</a></p>` };
+  return {
+    html: `${vacio(L('Esta página no existe.', 'This page does not exist.'), '🤷')}<p style="text-align:center"><a class="boton" href="/">${L('Ir al inicio', 'Go home')}</a></p>`,
+    titulo: L('Página no encontrada', 'Page not found'),
+  };
 }
 
 function vistaError() {
-  return `${vacio('No se pudieron cargar los datos. Revisa tu conexión a internet.', '📡')}
-    <p style="text-align:center"><button class="boton" type="button" data-accion="reintentar">Reintentar</button></p>`;
+  return `${vacio(L('No se pudieron cargar los datos. Revisa tu conexión a internet.', 'Could not load the data. Check your internet connection.'), '📡')}
+    <p style="text-align:center"><button class="boton" type="button" data-accion="reintentar">${L('Reintentar', 'Retry')}</button></p>`;
 }

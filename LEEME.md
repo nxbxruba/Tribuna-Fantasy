@@ -3,9 +3,22 @@
 Web/app de fútbol para móvil y ordenador: resultados en directo, 26 ligas, posible 11 comparando fuentes,
 fichajes y rumores al día y Fantasy de LaLiga con valores oficiales. Se instala como una app y es **gratis**.
 
-## Cómo abrirla en el PC
+## Cómo abrirla
 
-Haz doble clic en `index.html` (mejor con Chrome o Edge). Necesita internet.
+En **https://infofut-fantasy.pages.dev** (español) o **https://infofut-fantasy.pages.dev/en/** (inglés).
+
+Abrir `index.html` con doble clic ya **no funciona**: la web usa direcciones de verdad
+(`/fantasy`, `/liga/esp.1/clasificacion`...) y necesita estar publicada (o servida con un servidor).
+
+## Direcciones e idiomas
+
+- Cada sección tiene su dirección: `/fantasy`, `/fichajes`, `/liga/esp.1/clasificacion`, `/partido/...`
+  Los enlaces antiguos con `#/` siguen funcionando: se convierten solos.
+- **Inglés**: las mismas direcciones con `/en` delante (`/en/fantasy`). Se cambia desde el menú ☰
+  (arriba del todo) o en Ajustes → Idioma. La app instalada recuerda el idioma elegido.
+- Cada texto de la web está escrito como `L('español', 'English')` en los archivos de `js/`.
+- **Google**: los títulos y descripciones de cada sección están en `seo.json`. Al publicar,
+  `generar-paginas.ps1` crea una página por sección e idioma (282 en total) y el `sitemap.xml`.
 
 ## Qué tiene
 
@@ -87,6 +100,7 @@ pasarlo a amigos, se puede generar gratis en https://www.pwabuilder.com con la d
 | `datos/` | Datos descargados por el script (no tocar a mano) |
 | `actualizar-datos.ps1` + `Actualizar datos.bat` | Descargan Fantasy, alineaciones y fichajes |
 | `.github/workflows/publicar.yml` | Publica la web y actualiza los datos en GitHub |
+| `seo.json` + `generar-paginas.ps1` | Títulos para Google y páginas de cada sección e idioma |
 | `iconos/`, `manifest.webmanifest`, `sw.js` | Para instalarla como app |
 
 ## Cambios fáciles

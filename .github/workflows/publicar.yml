@@ -51,11 +51,17 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force dist, dist\datos | Out-Null
-          Copy-Item index.html, estilos.css, manifest.webmanifest, sw.js, robots.txt, sitemap.xml -Destination dist
+          Copy-Item index.html, estilos.css, manifest.webmanifest, sw.js, robots.txt, seo.json -Destination dist
           Get-ChildItem google*.html -ErrorAction SilentlyContinue | Copy-Item -Destination dist
           Copy-Item js, iconos -Destination dist -Recurse
           Copy-Item datos\*.js -Destination dist\datos
           if (Test-Path datos\estado.json) { Copy-Item datos\estado.json -Destination dist\datos }
+
+      # Una página por sección e idioma (/fantasy, /en/fantasy, /liga/esp.1/clasificacion...)
+      # con su título y descripción para Google, y el sitemap.xml completo
+      - name: Generar páginas para Google
+        shell: powershell
+        run: .\generar-paginas.ps1 -Dist dist
 
       - name: Crear el proyecto en Cloudflare (solo la primera vez)
         shell: powershell

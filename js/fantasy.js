@@ -4,9 +4,21 @@
    FANTASY LALIGA (datos oficiales de LaLiga Fantasy)
    Guardados en datos/fantasy.js por actualizar-datos.ps1
    ========================================================= */
-const POS_FANTASY = { 1: 'POR', 2: 'DEF', 3: 'MED', 4: 'DEL', 5: 'ENT' };
-const NOMBRE_POS_FANTASY = { 1: 'Portero', 2: 'Defensa', 3: 'Centrocampista', 4: 'Delantero', 5: 'Entrenador' };
-const ESTADOS_FANTASY = { injured: 'Lesionado', doubtful: 'Duda', suspended: 'Sancionado' };
+const POS_FANTASY = EN
+  ? { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD', 5: 'MGR' }
+  : { 1: 'POR', 2: 'DEF', 3: 'MED', 4: 'DEL', 5: 'ENT' };
+const NOMBRE_POS_FANTASY = {
+  1: L('Portero', 'Goalkeeper'),
+  2: L('Defensa', 'Defender'),
+  3: L('Centrocampista', 'Midfielder'),
+  4: L('Delantero', 'Forward'),
+  5: L('Entrenador', 'Manager'),
+};
+const ESTADOS_FANTASY = {
+  injured: L('Lesionado', 'Injured'),
+  doubtful: L('Duda', 'Doubtful'),
+  suspended: L('Sancionado', 'Suspended'),
+};
 
 const datosFantasyDisponibles = () => !!window.DATOS_FANTASY?.jugadores?.length;
 const equipoFantasy = (id) => window.DATOS_FANTASY?.equipos?.[id] || {};
@@ -33,15 +45,15 @@ function cambioFantasy(j, dias) {
 // Tendencia: cuántos de los últimos 3 cambios diarios han sido subidas o bajadas
 function tendenciaFantasy(j) {
   const h = (j.h || []).filter((x) => x != null).slice(-4);
-  if (h.length < 4) return { texto: 'Sin datos', clase: 'igual' };
+  if (h.length < 4) return { texto: L('Sin datos', 'No data'), clase: 'igual' };
   const cambios = h.slice(1).map((v, i) => v - h[i]);
   const suben = cambios.filter((c) => c > 0).length;
   const bajan = cambios.filter((c) => c < 0).length;
-  if (suben === 3) return { texto: '📈 Subiendo fuerte', clase: 'sube' };
-  if (suben >= 2) return { texto: '↗ Al alza', clase: 'sube' };
-  if (bajan === 3) return { texto: '📉 Bajando fuerte', clase: 'baja' };
-  if (bajan >= 2) return { texto: '↘ A la baja', clase: 'baja' };
-  return { texto: '→ Estable', clase: 'igual' };
+  if (suben === 3) return { texto: L('📈 Subiendo fuerte', '📈 Rising fast'), clase: 'sube' };
+  if (suben >= 2) return { texto: L('↗ Al alza', '↗ Rising'), clase: 'sube' };
+  if (bajan === 3) return { texto: L('📉 Bajando fuerte', '📉 Falling fast'), clase: 'baja' };
+  if (bajan >= 2) return { texto: L('↘ A la baja', '↘ Falling'), clase: 'baja' };
+  return { texto: L('→ Estable', '→ Stable'), clase: 'igual' };
 }
 
 const puntosPorMillon = (j) => (j.precio ? j.puntos / (j.precio / 1e6) : 0);
@@ -78,7 +90,7 @@ function probabilidadTitularFF(j) {
 
 /* ----- Piezas de HTML ----- */
 function filaJugadorFantasy(j, dias = 1, extra = '') {
-  return `<a href="#/fantasy/jugador/${enc(j.id)}">
+  return `<a href="/fantasy/jugador/${enc(j.id)}">
     ${fotoFantasy(j)}
     <span class="nombre"><b>${esc(j.nombre)}</b> ${htmlEstadoFantasy(j.estado)}<br>
       <small>${esc(equipoFantasy(j.equipo).corto || nombreEquipoFantasy(j.equipo))} · ${esc(POS_FANTASY[j.pos] || '')}${extra ? ' · ' + extra : ''}</small></span>
@@ -88,33 +100,33 @@ function filaJugadorFantasy(j, dias = 1, extra = '') {
 
 function htmlFormaFantasy(j) {
   return `<span class="forma">${ultimasJornadas(j).map(([s, p]) => (p == null
-    ? `<b title="Jornada ${s}: no jugó">–</b>`
-    : `<b class="${p >= 6 ? 'G' : p < 2 ? 'P' : ''}" title="Jornada ${s}: ${p} puntos">${p}</b>`)).join('')}</span>`;
+    ? `<b title="${L(`Jornada ${s}: no jugó`, `Matchday ${s}: did not play`)}">–</b>`
+    : `<b class="${p >= 6 ? 'G' : p < 2 ? 'P' : ''}" title="${L(`Jornada ${s}: ${p} puntos`, `Matchday ${s}: ${p} points`)}">${p}</b>`)).join('')}</span>`;
 }
 
 function avisoActualizacion() {
   const d = window.DATOS_FANTASY;
   const horas = (Date.now() - new Date(d.actualizado)) / 36e5;
   const viejo = horas > 30;
-  return `<p class="nota">${viejo ? '⚠️ ' : ''}Valores oficiales de <b>LaLiga Fantasy</b>${d.jornada ? ` · jornada ${esc(d.jornada)}` : ''} · actualizados ${esc(haceTiempo(d.actualizado).toLowerCase())}
-    ${viejo ? '· Ejecuta <b>Actualizar datos.bat</b> para tener los valores de hoy.' : ''}</p>`;
+  return `<p class="nota">${viejo ? '⚠️ ' : ''}${L('Valores oficiales de', 'Official values from')} <b>LaLiga Fantasy</b>${d.jornada ? ` · ${L('jornada', 'matchday')} ${esc(d.jornada)}` : ''} · ${L('actualizados', 'updated')} ${esc(haceTiempo(d.actualizado).toLowerCase())}
+    ${viejo ? L('· Ejecuta <b>Actualizar datos.bat</b> para tener los valores de hoy.', '· Data may be out of date.') : ''}</p>`;
 }
 
 /* =========================================================
    VISTA: FANTASY
    ========================================================= */
 const PESTANAS_FANTASY = [
-  ['mercado', 'Subidas y bajadas'],
-  ['jugadores', 'Buscar jugadores'],
-  ['once', 'Once ideal y chollos'],
-  ['lesionados', 'Parte médico'],
+  ['mercado', L('Subidas y bajadas', 'Risers and fallers')],
+  ['jugadores', L('Buscar jugadores', 'Player prices')],
+  ['once', L('Once ideal y chollos', 'Best XI and bargains')],
+  ['lesionados', L('Parte médico', 'Injuries')],
 ];
 
 async function vistaFantasy(pestana, params) {
   const cabecera = `<header class="cab-pagina"><div><p class="cab-sub">LaLiga</p><h1>💰 Fantasy</h1></div></header>`;
   if (!datosFantasyDisponibles()) {
     return {
-      html: `${cabecera}${vacio('Todavía no hay datos Fantasy. En la carpeta de la web, haz doble clic en "Actualizar datos.bat" y recarga la página.', '💰')}`,
+      html: `${cabecera}${vacio(L('Todavía no hay datos Fantasy. En la carpeta de la web, haz doble clic en "Actualizar datos.bat" y recarga la página.', 'No Fantasy data yet.'), '💰')}`,
     };
   }
   const contenido = {
@@ -126,7 +138,7 @@ async function vistaFantasy(pestana, params) {
   if (!contenido) return vistaNoEncontrada();
   const r = contenido(params);
   return {
-    html: cabecera + pestanas(PESTANAS_FANTASY, pestana, '#/fantasy/') + avisoActualizacion() + r.html,
+    html: cabecera + pestanas(PESTANAS_FANTASY, pestana, '/fantasy/') + avisoActualizacion() + r.html,
     alMontar: r.alMontar,
   };
 }
@@ -138,38 +150,38 @@ function fantasyMercado(params) {
   const jugadores = window.DATOS_FANTASY.jugadores.map((j) => ({ j, c: cambioFantasy(j, dias) }));
   const suben = jugadores.filter((x) => x.c > 0).sort((a, b) => b.c - a.c).slice(0, 20);
   const bajan = jugadores.filter((x) => x.c < 0).sort((a, b) => a.c - b.c).slice(0, 20);
-  const periodos = [[1, 'Hoy'], [3, '3 días'], [7, '7 días'], [30, '30 días']];
+  const periodos = [[1, L('Hoy', 'Today')], [3, L('3 días', '3 days')], [7, L('7 días', '7 days')], [30, L('30 días', '30 days')]];
 
   const lista = (titulo, items) => `<section class="tarjeta">
     <div class="bloque-cab"><span>${titulo}</span></div>
-    <div class="lista-jugadores">${items.map(({ j }) => filaJugadorFantasy(j, dias)).join('') || '<p class="vacio">Sin cambios en este periodo (falta historial).</p>'}</div>
+    <div class="lista-jugadores">${items.map(({ j }) => filaJugadorFantasy(j, dias)).join('') || `<p class="vacio">${L('Sin cambios en este periodo (falta historial).', 'No changes in this period (not enough history).')}</p>`}</div>
   </section>`;
 
   return {
     html: `<div class="chips">${periodos.map(([d, t]) =>
-        `<a class="chip ${d === dias ? 'activo' : ''}" href="#/fantasy/mercado?periodo=${d}">${t}</a>`).join('')}</div>
-      <div class="dos-columnas">${lista('📈 Los que más suben', suben)}${lista('📉 Los que más bajan', bajan)}</div>`,
+        `<a class="chip ${d === dias ? 'activo' : ''}" href="/fantasy/mercado?periodo=${d}">${t}</a>`).join('')}</div>
+      <div class="dos-columnas">${lista(`📈 ${L('Los que más suben', 'Biggest risers')}`, suben)}${lista(`📉 ${L('Los que más bajan', 'Biggest fallers')}`, bajan)}</div>`,
   };
 }
 
 function fantasyJugadores(params) {
-  const equipos = Object.entries(window.DATOS_FANTASY.equipos).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
+  const equipos = Object.entries(window.DATOS_FANTASY.equipos).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, LOCALE));
   const html = `<div class="filtros">
-      <input class="campo" id="f-texto" type="search" placeholder="Buscar jugador..." value="${esc(params.get('q') || '')}" autocomplete="off">
-      <select class="campo" id="f-pos"><option value="">Todas las posiciones</option>
+      <input class="campo" id="f-texto" type="search" placeholder="${L('Buscar jugador...', 'Search player...')}" value="${esc(params.get('q') || '')}" autocomplete="off">
+      <select class="campo" id="f-pos"><option value="">${L('Todas las posiciones', 'All positions')}</option>
         ${Object.entries(NOMBRE_POS_FANTASY).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
-      <select class="campo" id="f-equipo"><option value="">Todos los equipos</option>
+      <select class="campo" id="f-equipo"><option value="">${L('Todos los equipos', 'All teams')}</option>
         ${equipos.map(([id, e]) => `<option value="${esc(id)}">${esc(e.nombre)}</option>`).join('')}</select>
       <select class="campo" id="f-orden">
-        <option value="precio">Más caros</option>
-        <option value="puntos">Más puntos</option>
-        <option value="media">Mejor media</option>
-        <option value="rentable">Más puntos por millón</option>
-        <option value="sube">Más suben hoy</option>
-        <option value="sube7">Más suben (7 días)</option>
-        <option value="baja">Más bajan hoy</option>
-        <option value="titular">Más probable que jueguen</option>
-        <option value="barato">Más baratos</option>
+        <option value="precio">${L('Más caros', 'Most expensive')}</option>
+        <option value="puntos">${L('Más puntos', 'Most points')}</option>
+        <option value="media">${L('Mejor media', 'Best average')}</option>
+        <option value="rentable">${L('Más puntos por millón', 'Most points per million')}</option>
+        <option value="sube">${L('Más suben hoy', 'Biggest risers today')}</option>
+        <option value="sube7">${L('Más suben (7 días)', 'Biggest risers (7 days)')}</option>
+        <option value="baja">${L('Más bajan hoy', 'Biggest fallers today')}</option>
+        <option value="titular">${L('Más probable que jueguen', 'Most likely to start')}</option>
+        <option value="barato">${L('Más baratos', 'Cheapest')}</option>
       </select>
     </div>
     <p class="nota" id="f-cuenta"></p>
@@ -201,13 +213,17 @@ function fantasyJugadores(params) {
         && (!pos || String(j.pos) === pos)
         && (!equipo || j.equipo === equipo))
       .sort(ordenes[orden]);
-    document.getElementById('f-cuenta').textContent =
-      `${filtrados.length} ${filtrados.length === 1 ? 'jugador' : 'jugadores'}${filtrados.length > 100 ? ' (se muestran los 100 primeros)' : ''}`;
-    document.getElementById('f-lista').innerHTML = filtrados.slice(0, 100).map((j) => {
+    const n = filtrados.length;
+    document.getElementById('f-cuenta').textContent = L(
+      `${n} ${n === 1 ? 'jugador' : 'jugadores'}${n > 100 ? ' (se muestran los 100 primeros)' : ''}`,
+      `${n} ${n === 1 ? 'player' : 'players'}${n > 100 ? ' (showing the first 100)' : ''}`);
+    const lista = document.getElementById('f-lista');
+    lista.innerHTML = filtrados.slice(0, 100).map((j) => {
       const p = orden === 'titular' ? prob(j) : null;
-      const extra = p != null && p >= 0 ? `<span class="pct ${claseProbabilidad(p)}">${pct(p)} titular</span>` : `${j.puntos} pts`;
+      const extra = p != null && p >= 0 ? `<span class="pct ${claseProbabilidad(p)}">${pct(p)} ${L('titular', 'to start')}</span>` : `${j.puntos} pts`;
       return filaJugadorFantasy(j, orden === 'sube7' ? 7 : 1, extra);
-    }).join('') || '<p class="vacio">No hay jugadores con esos filtros.</p>';
+    }).join('') || `<p class="vacio">${L('No hay jugadores con esos filtros.', 'No players match these filters.')}</p>`;
+    ajustarEnlaces(lista);
   }
 
   return {
@@ -227,7 +243,7 @@ function fantasyOnce() {
   const valorOnce = once.reduce((s, j) => s + j.precio, 0);
 
   const campo = `<div class="campo-futbol">${[4, 3, 2, 1].map((pos) => `<div class="linea-campo">${once.filter((j) => j.pos === pos).map((j) =>
-    `<a class="ficha prob-alta" href="#/fantasy/jugador/${enc(j.id)}" title="${esc(j.nombre)}">
+    `<a class="ficha prob-alta" href="/fantasy/jugador/${enc(j.id)}" title="${esc(j.nombre)}">
       <span class="circulo">${esc(j.puntos)}</span>
       <span class="nombre-ficha">${esc(j.nombre)}</span>
     </a>`).join('')}</div>`).join('')}</div>`;
@@ -244,22 +260,22 @@ function fantasyOnce() {
   return {
     html: `<div class="dos-columnas">
       <section class="tarjeta">
-        <div class="bloque-cab"><span>⭐ Once ideal por puntos (4-3-3)</span><small>${esc(fmtMillones(valorOnce))}</small></div>
+        <div class="bloque-cab"><span>⭐ ${L('Once ideal por puntos (4-3-3)', 'Best XI by points (4-3-3)')}</span><small>${esc(fmtMillones(valorOnce))}</small></div>
         ${campo}
-        <p class="nota relleno" style="margin:0">Los números son los puntos totales de la temporada.</p>
+        <p class="nota relleno" style="margin:0">${L('Los números son los puntos totales de la temporada.', 'Numbers are total season points.')}</p>
       </section>
       <div>
         <section class="tarjeta">
-          <div class="bloque-cab"><span>💎 Chollos</span><small>puntos por millón</small></div>
-          <div class="lista-jugadores">${chollos.map((j) => filaJugadorFantasy(j, 1, `${puntosPorMillon(j).toLocaleString('es-ES', { maximumFractionDigits: 1 })} pts/M€`)).join('')}</div>
+          <div class="bloque-cab"><span>💎 ${L('Chollos', 'Bargains')}</span><small>${L('puntos por millón', 'points per million')}</small></div>
+          <div class="lista-jugadores">${chollos.map((j) => filaJugadorFantasy(j, 1, `${fmtNumero(puntosPorMillon(j))} pts/M€`)).join('')}</div>
         </section>
         <section class="tarjeta">
-          <div class="bloque-cab"><span>🔥 En forma</span><small>puntos en las 3 últimas jornadas</small></div>
+          <div class="bloque-cab"><span>🔥 ${L('En forma', 'In form')}</span><small>${L('puntos en las 3 últimas jornadas', 'points in the last 3 matchdays')}</small></div>
           <div class="lista-jugadores">${enForma.map((j) => filaJugadorFantasy(j, 1, `${sumaForma(j)} pts`)).join('')}</div>
         </section>
         ${titularesBaratos.length ? `<section class="tarjeta">
-          <div class="bloque-cab"><span>🎯 Titulares por menos de 10 M€</span><small>según Futbol Fantasy</small></div>
-          <div class="lista-jugadores">${titularesBaratos.map(({ j, p }) => filaJugadorFantasy(j, 1, `<span class="pct ${claseProbabilidad(p)}">${pct(p)} titular</span>`)).join('')}</div>
+          <div class="bloque-cab"><span>🎯 ${L('Titulares por menos de 10 M€', 'Starters under 10 M€')}</span><small>${L('según Futbol Fantasy', 'per Futbol Fantasy')}</small></div>
+          <div class="lista-jugadores">${titularesBaratos.map(({ j, p }) => filaJugadorFantasy(j, 1, `<span class="pct ${claseProbabilidad(p)}">${pct(p)} ${L('titular', 'to start')}</span>`)).join('')}</div>
         </section>` : ''}
       </div>
     </div>`,
@@ -273,7 +289,7 @@ function fantasyLesionados() {
     if (!porEquipo.has(j.equipo)) porEquipo.set(j.equipo, []);
     porEquipo.get(j.equipo).push(j);
   }
-  const equipos = [...porEquipo].sort((a, b) => nombreEquipoFantasy(a[0]).localeCompare(nombreEquipoFantasy(b[0]), 'es'));
+  const equipos = [...porEquipo].sort((a, b) => nombreEquipoFantasy(a[0]).localeCompare(nombreEquipoFantasy(b[0]), LOCALE));
   const resumen = Object.entries(ESTADOS_FANTASY).map(([k]) =>
     `<span>${htmlEstadoFantasy(k)} ${afectados.filter((j) => j.estado === k).length}</span>`).join('');
   return {
@@ -300,19 +316,19 @@ async function vistaFantasyJugador(id) {
   const titular = probabilidadTitularFF(j);
 
   const datos = [
-    ['Valor de mercado', esc(fmtMillones(j.precio))],
-    ['Cambio hoy', htmlCambio(cambioFantasy(j, 1))],
-    ['Cambio 7 días', htmlCambio(cambioFantasy(j, 7), true)],
-    ['Cambio 30 días', htmlCambio(cambioFantasy(j, 30), true)],
-    ['Tendencia', `<span class="cambio ${tendencia.clase}">${esc(tendencia.texto)}</span>`],
-    ['Puntos', esc(j.puntos)],
-    ['Media por partido', esc(Number(j.media || 0).toLocaleString('es-ES', { maximumFractionDigits: 2 }))],
-    ['Puntos por millón', esc(puntosPorMillon(j).toLocaleString('es-ES', { maximumFractionDigits: 1 }))],
-    ['Temporada pasada', j.anterior ? `${esc(j.anterior)} pts` : '—'],
+    [L('Valor de mercado', 'Market value'), esc(fmtMillones(j.precio))],
+    [L('Cambio hoy', 'Change today'), htmlCambio(cambioFantasy(j, 1))],
+    [L('Cambio 7 días', 'Change 7 days'), htmlCambio(cambioFantasy(j, 7), true)],
+    [L('Cambio 30 días', 'Change 30 days'), htmlCambio(cambioFantasy(j, 30), true)],
+    [L('Tendencia', 'Trend'), `<span class="cambio ${tendencia.clase}">${esc(tendencia.texto)}</span>`],
+    [L('Puntos', 'Points'), esc(j.puntos)],
+    [L('Media por partido', 'Average per match'), esc(fmtNumero(j.media, 2))],
+    [L('Puntos por millón', 'Points per million'), esc(fmtNumero(puntosPorMillon(j)))],
+    [L('Temporada pasada', 'Last season'), j.anterior ? `${esc(j.anterior)} pts` : '—'],
   ];
 
   return {
-    html: `<a class="boton" href="#/fantasy/jugadores" style="margin-bottom:14px">‹ Fantasy</a>
+    html: `<a class="boton" href="/fantasy/jugadores" style="margin-bottom:14px">‹ Fantasy</a>
       <header class="cab-pagina">
         ${fotoFantasy(j, 'foto-grande')}
         <div>
@@ -322,28 +338,31 @@ async function vistaFantasyJugador(id) {
         </div>
       </header>
       ${titular ? `<section class="tarjeta relleno">
-          <b>Próximo partido${titular.partido ? ` (${esc(titular.partido)})` : ''}:</b>
-          <span class="pct ${claseProbabilidad(titular.prob)}">${pct(titular.prob)}</span> de probabilidad de ser titular
-          <br><small class="texto-suave">Según <a href="${urlSegura(titular.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--acento)">Futbol Fantasy</a></small>
+          <b>${L('Próximo partido', 'Next match')}${titular.partido ? ` (${esc(titular.partido)})` : ''}:</b>
+          <span class="pct ${claseProbabilidad(titular.prob)}">${pct(titular.prob)}</span> ${L('de probabilidad de ser titular', 'chance of starting')}
+          <br><small class="texto-suave">${L('Según', 'Per')} <a href="${urlSegura(titular.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--acento)">Futbol Fantasy</a></small>
         </section>` : ''}
       <section class="tarjeta">
         <div class="datos-clave">${datos.map(([t, v]) => `<div class="dato"><small>${esc(t)}</small><b>${v}</b></div>`).join('')}</div>
       </section>
       <section class="tarjeta">
-        <div class="bloque-cab"><span>Últimas 5 jornadas</span>${htmlFormaFantasy(j)}</div>
+        <div class="bloque-cab"><span>${L('Últimas 5 jornadas', 'Last 5 matchdays')}</span>${htmlFormaFantasy(j)}</div>
       </section>
       <section class="tarjeta">
-        <div class="bloque-cab"><span>Evolución del valor</span><small>últimos ${puntos.length} días</small></div>
+        <div class="bloque-cab"><span>${L('Evolución del valor', 'Value history')}</span><small>${L(`últimos ${puntos.length} días`, `last ${puntos.length} days`)}</small></div>
         ${grafico.html}
       </section>
-      <p class="fila-botones"><a class="boton" href="#/buscar?q=${enc(j.completo || j.nombre)}">🔍 Buscar estadísticas en ESPN</a></p>`,
+      <p class="fila-botones"><a class="boton" href="/buscar?q=${enc(j.completo || j.nombre)}">🔍 ${L('Buscar estadísticas en ESPN', 'Search stats on ESPN')}</a></p>`,
+    titulo: L(`${j.nombre}: valor en LaLiga Fantasy y evolución`, `${j.nombre}: LaLiga Fantasy value and trend`),
+    descripcion: L(`Valor de mercado de ${j.nombre} en LaLiga Fantasy (${fmtMillones(j.precio)}), cambios, puntos y probabilidad de ser titular.`,
+      `${j.nombre} LaLiga Fantasy market value (${fmtMillones(j.precio)}), changes, points and chance of starting.`),
     alMontar: grafico.alMontar,
   };
 }
 
 /* ----- Gráfico de línea del valor (SVG) con guía y tooltip al pasar el dedo/ratón ----- */
 function crearGraficoPrecio(puntos) {
-  if (puntos.length < 2) return { html: '<p class="vacio">Todavía no hay historial suficiente.</p>' };
+  if (puntos.length < 2) return { html: `<p class="vacio">${L('Todavía no hay historial suficiente.', 'Not enough history yet.')}</p>` };
   const H = 220;
   const m = { izq: 58, der: 12, arr: 14, aba: 26 };
   const valores = puntos.map((p) => p.valor);
@@ -355,14 +374,16 @@ function crearGraficoPrecio(puntos) {
   max += margen;
   const y = (v) => m.arr + (1 - (v - min) / (max - min)) * (H - m.arr - m.aba);
   const marcas = [0, 1, 2, 3].map((k) => min + ((max - min) * k) / 3);
-  const fmtFecha = (f) => new Date(f + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  const resumen = `Evolución del valor de mercado: de ${fmtMillones(valores[0])} el ${fmtFecha(puntos[0].fecha)} a ${fmtMillones(valores[valores.length - 1])} el ${fmtFecha(puntos[puntos.length - 1].fecha)}`;
+  const fmtFecha = (f) => new Date(f + 'T12:00:00').toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' });
+  const desde = `${fmtMillones(valores[0])} (${fmtFecha(puntos[0].fecha)})`;
+  const hasta = `${fmtMillones(valores[valores.length - 1])} (${fmtFecha(puntos[puntos.length - 1].fecha)})`;
+  const resumen = L(`Evolución del valor de mercado: de ${desde} a ${hasta}`, `Market value history: from ${desde} to ${hasta}`);
 
   // Tabla con los datos, para quien no pueda ver el gráfico
   const tabla = `<details class="relleno" style="border-top:1px solid var(--borde)">
-    <summary style="cursor:pointer;font-weight:600">Ver tabla de valores</summary>
+    <summary style="cursor:pointer;font-weight:600">${L('Ver tabla de valores', 'Show value table')}</summary>
     <div class="tabla-scroll" style="max-height:260px;margin-top:8px"><table>
-      <thead><tr><th class="izq">Fecha</th><th class="der">Valor</th><th class="der">Cambio</th></tr></thead>
+      <thead><tr><th class="izq">${L('Fecha', 'Date')}</th><th class="der">${L('Valor', 'Value')}</th><th class="der">${L('Cambio', 'Change')}</th></tr></thead>
       <tbody>${puntos.map((p, i) => [p, i]).reverse().map(([p, i]) => `<tr><td class="izq">${esc(fmtFecha(p.fecha))}</td>
         <td class="der">${esc(fmtMillones(p.valor))}</td><td class="der">${i ? htmlCambio(p.valor - puntos[i - 1].valor) : ''}</td></tr>`).join('')}</tbody>
     </table></div>

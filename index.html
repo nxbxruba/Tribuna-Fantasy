@@ -3,9 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>InfoFut Fantasy</title>
-  <meta name="description" content="InfoFut Fantasy: resultados de fútbol en directo, clasificaciones, posible 11 comparando fuentes, fichajes y Fantasy de LaLiga con valores oficiales.">
+  <!-- El bloque "seo" de abajo lo cambia generar-paginas.ps1 en cada sección e idioma -->
+  <!--seo-->
+  <title>InfoFut Fantasy: resultados en directo, posible 11, fichajes y Fantasy LaLiga</title>
+  <meta name="description" content="Resultados de fútbol en directo, clasificaciones, posible 11 comparando fuentes, últimos fichajes y Fantasy de LaLiga con valores oficiales.">
   <link rel="canonical" href="https://infofut-fantasy.pages.dev/">
+  <link rel="alternate" hreflang="es" href="https://infofut-fantasy.pages.dev/">
+  <link rel="alternate" hreflang="en" href="https://infofut-fantasy.pages.dev/en/">
+  <link rel="alternate" hreflang="x-default" href="https://infofut-fantasy.pages.dev/">
+  <meta property="og:title" content="InfoFut Fantasy">
+  <meta property="og:description" content="Resultados en directo, posible 11, fichajes y Fantasy de LaLiga con valores oficiales.">
+  <meta property="og:url" content="https://infofut-fantasy.pages.dev/">
+  <meta property="og:locale" content="es_ES">
+  <!--/seo-->
   <!-- Verificación de propiedad en Google Search Console -->
   <meta name="google-site-verification" content="LjhKWoUPePV1ysvr-nK3KtdfKzqYf_9MXjJXujulhaU">
   <!-- Ficha para buscadores: así Google sabe que el sitio se llama "InfoFut Fantasy" -->
@@ -16,7 +26,7 @@
       "name": "InfoFut Fantasy",
       "alternateName": ["InfoFut", "Info Fut Fantasy"],
       "url": "https://infofut-fantasy.pages.dev/",
-      "inLanguage": "es",
+      "inLanguage": ["es", "en"],
       "description": "Resultados de fútbol en directo, posible 11, fichajes y Fantasy de LaLiga."
     }
   </script>
@@ -24,23 +34,19 @@
   <!-- Vista previa al compartir el enlace (WhatsApp, Telegram, redes sociales) -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="InfoFut Fantasy">
-  <meta property="og:title" content="InfoFut Fantasy">
-  <meta property="og:description" content="Resultados en directo, posible 11, fichajes y Fantasy de LaLiga con valores oficiales.">
-  <meta property="og:url" content="https://infofut-fantasy.pages.dev/">
   <meta property="og:image" content="https://infofut-fantasy.pages.dev/iconos/compartir.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Logo de InfoFut Fantasy: un balón sobre una grada">
-  <meta property="og:locale" content="es_ES">
+  <meta property="og:image:alt" content="InfoFut Fantasy">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://infofut-fantasy.pages.dev/iconos/compartir.png">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="iconos/logo.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="iconos/icono-192.png" type="image/png">
-  <link rel="apple-touch-icon" sizes="180x180" href="iconos/apple-touch-icon.png?v=2">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/iconos/logo.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/iconos/icono-192.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/iconos/apple-touch-icon.png?v=2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="InfoFut">
-  <link rel="stylesheet" href="estilos.css">
+  <link rel="stylesheet" href="/estilos.css">
   <script>
     // Aplica el tema guardado antes de pintar para evitar parpadeos
     try { var t = JSON.parse(localStorage.getItem('ft.tema')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
@@ -49,48 +55,50 @@
 <body>
   <header class="cabecera">
     <div class="contenedor cabecera-fila">
-      <button class="boton-icono hamburguesa" type="button" id="abrir-menu" aria-label="Abrir menú" aria-controls="cajon" aria-expanded="false"><span></span></button>
-      <a class="marca" href="#/"><img class="logo" src="iconos/logo.svg" alt="" width="30" height="30">InfoFut <span>Fantasy</span></a>
-      <nav class="menu" aria-label="Menú principal">
-        <a href="#/" data-seccion="inicio"><span class="menu-icono">🏠</span><span>Inicio</span></a>
-        <a href="#/noticias" data-seccion="noticias"><span class="menu-icono">📰</span><span>Noticias</span></a>
-        <a href="#/fantasy" data-seccion="fantasy"><span class="menu-icono">💰</span><span>Fantasy</span></a>
-        <a href="#/fichajes" data-seccion="fichajes"><span class="menu-icono">🔄</span><span>Fichajes</span></a>
+      <button class="boton-icono hamburguesa" type="button" id="abrir-menu" aria-label="Abrir menú" data-en-aria="Open menu" aria-controls="cajon" aria-expanded="false"><span></span></button>
+      <a class="marca" href="/"><img class="logo" src="/iconos/logo.svg" alt="" width="30" height="30">InfoFut <span>Fantasy</span></a>
+      <nav class="menu" aria-label="Menú principal" data-en-aria="Main menu">
+        <a href="/" data-seccion="inicio"><span class="menu-icono">🏠</span><span data-en="Home">Inicio</span></a>
+        <a href="/noticias" data-seccion="noticias"><span class="menu-icono">📰</span><span data-en="News">Noticias</span></a>
+        <a href="/fantasy" data-seccion="fantasy"><span class="menu-icono">💰</span><span>Fantasy</span></a>
+        <a href="/fichajes" data-seccion="fichajes"><span class="menu-icono">🔄</span><span data-en="Transfers">Fichajes</span></a>
       </nav>
-      <button class="boton-icono boton-refrescar" type="button" id="refrescar" aria-label="Actualizar" title="Actualizar"><span>↻</span></button>
-      <a class="boton-icono" href="#/buscar" aria-label="Buscar">🔍</a>
+      <button class="boton-icono boton-refrescar" type="button" id="refrescar" aria-label="Actualizar" data-en-aria="Refresh" title="Actualizar"><span>↻</span></button>
+      <a class="boton-icono" href="/buscar" aria-label="Buscar" data-en-aria="Search">🔍</a>
     </div>
   </header>
 
   <div class="velo" id="velo"></div>
-  <aside class="cajon" id="cajon" aria-label="Menú"></aside>
+  <aside class="cajon" id="cajon" aria-label="Menú" data-en-aria="Menu"></aside>
 
   <main class="contenedor" id="app" aria-live="polite">
-    <!-- Texto inicial (lo ven los buscadores; se sustituye en cuanto carga la web) -->
+    <!-- Texto inicial: lo leen los buscadores y se sustituye en cuanto carga la web -->
+    <!--intro-->
     <h1 class="titulo-seccion">InfoFut Fantasy</h1>
     <p class="nota">Resultados de fútbol en directo de LaLiga, Premier League, Champions y más ligas; posible 11 comparando fuentes;
       últimos fichajes y rumores; y Fantasy de LaLiga con valores oficiales, subidas, bajadas y chollos.</p>
+    <!--/intro-->
   </main>
 
   <footer class="pie contenedor">
-    <p>Datos: ESPN (partidos y noticias), LaLiga Fantasy (precios), Futbol Fantasy (alineaciones probables) y Transfermarkt (fichajes). Proyecto personal sin afiliación con ligas ni clubes.</p>
+    <p data-en="Data: ESPN (matches and news), LaLiga Fantasy (prices), Futbol Fantasy (predicted line-ups) and Transfermarkt (transfers). Personal project, not affiliated with any league or club.">Datos: ESPN (partidos y noticias), LaLiga Fantasy (precios), Futbol Fantasy (alineaciones probables) y Transfermarkt (fichajes). Proyecto personal sin afiliación con ligas ni clubes.</p>
   </footer>
 
   <div class="aviso-toast" id="toast" role="status"></div>
 
   <!-- Datos descargados con "Actualizar datos.bat" (o automáticamente por GitHub Actions) -->
-  <script src="datos/fantasy.js"></script>
-  <script src="datos/alineaciones.js"></script>
-  <script src="datos/fichajes.js"></script>
+  <script src="/datos/fantasy.js"></script>
+  <script src="/datos/alineaciones.js"></script>
+  <script src="/datos/fichajes.js"></script>
 
-  <script src="js/nucleo.js"></script>
-  <script src="js/partidos.js"></script>
-  <script src="js/posible-once.js"></script>
-  <script src="js/ligas.js"></script>
-  <script src="js/fantasy.js"></script>
-  <script src="js/fichajes.js"></script>
-  <script src="js/buscar.js"></script>
-  <script src="js/menu.js"></script>
-  <script src="js/app.js"></script>
+  <script src="/js/nucleo.js"></script>
+  <script src="/js/partidos.js"></script>
+  <script src="/js/posible-once.js"></script>
+  <script src="/js/ligas.js"></script>
+  <script src="/js/fantasy.js"></script>
+  <script src="/js/fichajes.js"></script>
+  <script src="/js/buscar.js"></script>
+  <script src="/js/menu.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>

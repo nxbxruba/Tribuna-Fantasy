@@ -1,65 +1,124 @@
 'use strict';
 
 /* =========================================================
+   IDIOMA
+   Español en "/", inglés en "/en/...". Cada texto de la web se
+   escribe como L('texto en español', 'text in English').
+   ========================================================= */
+const EN = /^\/en(\/|$)/.test(location.pathname);
+const L = (es, en) => (EN ? en : es);
+const LOCALE = EN ? 'en-GB' : 'es-ES';
+document.documentElement.lang = EN ? 'en' : 'es';
+
+/* =========================================================
    CONFIGURACIÓN
    Para añadir o quitar ligas, edita GRUPOS_LIGAS.
    El "id" es el código de ESPN de cada competición.
+   (generar-paginas.ps1 lee esta lista para crear las páginas de Google:
+   mantén el mismo formato en una línea por liga, con id, nombre, pais y paisEn)
    ========================================================= */
 const API = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
 const API_CLASIFICACION = 'https://site.api.espn.com/apis/v2/sports/soccer';
 const API_WEB = 'https://site.web.api.espn.com/apis';
-const IDIOMA = 'lang=es&region=es';
+const IDIOMA = EN ? 'lang=en&region=us' : 'lang=es&region=es';
 // Los datos en directo se piden sin idioma: la versión en español de ESPN llega con minutos de retraso
 const DIRECTO = 'region=us';
 const SEGUNDOS_ACTUALIZAR_DIRECTO = 30;
 
 const GRUPOS_LIGAS = [
-  { nombre: 'España', ligas: [
-    { id: 'esp.1', nombre: 'LaLiga', pais: 'España' },
-    { id: 'esp.2', nombre: 'Segunda División', pais: 'España' },
-    { id: 'esp.copa_del_rey', nombre: 'Copa del Rey', pais: 'España' },
+  { nombre: 'España', nombreEn: 'Spain', ligas: [
+    { id: 'esp.1', nombre: 'LaLiga', pais: 'España', paisEn: 'Spain' },
+    { id: 'esp.2', nombre: 'Segunda División', pais: 'España', paisEn: 'Spain' },
+    { id: 'esp.copa_del_rey', nombre: 'Copa del Rey', pais: 'España', paisEn: 'Spain' },
   ] },
-  { nombre: 'Grandes ligas', ligas: [
-    { id: 'eng.1', nombre: 'Premier League', pais: 'Inglaterra' },
-    { id: 'ita.1', nombre: 'Serie A', pais: 'Italia' },
-    { id: 'ger.1', nombre: 'Bundesliga', pais: 'Alemania' },
-    { id: 'fra.1', nombre: 'Ligue 1', pais: 'Francia' },
+  { nombre: 'Grandes ligas', nombreEn: 'Top leagues', ligas: [
+    { id: 'eng.1', nombre: 'Premier League', pais: 'Inglaterra', paisEn: 'England' },
+    { id: 'ita.1', nombre: 'Serie A', pais: 'Italia', paisEn: 'Italy' },
+    { id: 'ger.1', nombre: 'Bundesliga', pais: 'Alemania', paisEn: 'Germany' },
+    { id: 'fra.1', nombre: 'Ligue 1', pais: 'Francia', paisEn: 'France' },
   ] },
-  { nombre: 'Competiciones europeas', ligas: [
-    { id: 'uefa.champions', nombre: 'Champions League', pais: 'Europa' },
-    { id: 'uefa.europa', nombre: 'Europa League', pais: 'Europa' },
-    { id: 'uefa.europa.conf', nombre: 'Conference League', pais: 'Europa' },
+  { nombre: 'Competiciones europeas', nombreEn: 'European competitions', ligas: [
+    { id: 'uefa.champions', nombre: 'Champions League', pais: 'Europa', paisEn: 'Europe' },
+    { id: 'uefa.europa', nombre: 'Europa League', pais: 'Europa', paisEn: 'Europe' },
+    { id: 'uefa.europa.conf', nombre: 'Conference League', pais: 'Europa', paisEn: 'Europe' },
   ] },
-  { nombre: 'Más ligas de Europa', ligas: [
-    { id: 'por.1', nombre: 'Liga Portugal', pais: 'Portugal' },
-    { id: 'ned.1', nombre: 'Eredivisie', pais: 'Países Bajos' },
-    { id: 'eng.2', nombre: 'Championship', pais: 'Inglaterra' },
-    { id: 'tur.1', nombre: 'Superliga', pais: 'Turquía' },
-    { id: 'bel.1', nombre: 'Pro League', pais: 'Bélgica' },
-    { id: 'sco.1', nombre: 'Premiership', pais: 'Escocia' },
+  { nombre: 'Más ligas de Europa', nombreEn: 'More European leagues', ligas: [
+    { id: 'por.1', nombre: 'Liga Portugal', pais: 'Portugal', paisEn: 'Portugal' },
+    { id: 'ned.1', nombre: 'Eredivisie', pais: 'Países Bajos', paisEn: 'Netherlands' },
+    { id: 'eng.2', nombre: 'Championship', pais: 'Inglaterra', paisEn: 'England' },
+    { id: 'tur.1', nombre: 'Superliga', pais: 'Turquía', paisEn: 'Turkey' },
+    { id: 'bel.1', nombre: 'Pro League', pais: 'Bélgica', paisEn: 'Belgium' },
+    { id: 'sco.1', nombre: 'Premiership', pais: 'Escocia', paisEn: 'Scotland' },
   ] },
-  { nombre: 'América', america: true, ligas: [
-    { id: 'conmebol.libertadores', nombre: 'Copa Libertadores', pais: 'Sudamérica' },
-    { id: 'mex.1', nombre: 'Liga MX', pais: 'México' },
-    { id: 'arg.1', nombre: 'Liga Profesional', pais: 'Argentina' },
-    { id: 'bra.1', nombre: 'Brasileirão', pais: 'Brasil' },
-    { id: 'col.1', nombre: 'Primera A', pais: 'Colombia' },
-    { id: 'chi.1', nombre: 'Primera División', pais: 'Chile' },
-    { id: 'usa.1', nombre: 'MLS', pais: 'Estados Unidos' },
+  { nombre: 'América', nombreEn: 'Americas', america: true, ligas: [
+    { id: 'conmebol.libertadores', nombre: 'Copa Libertadores', pais: 'Sudamérica', paisEn: 'South America' },
+    { id: 'mex.1', nombre: 'Liga MX', pais: 'México', paisEn: 'Mexico' },
+    { id: 'arg.1', nombre: 'Liga Profesional', pais: 'Argentina', paisEn: 'Argentina' },
+    { id: 'bra.1', nombre: 'Brasileirão', pais: 'Brasil', paisEn: 'Brazil' },
+    { id: 'col.1', nombre: 'Primera A', pais: 'Colombia', paisEn: 'Colombia' },
+    { id: 'chi.1', nombre: 'Primera División', pais: 'Chile', paisEn: 'Chile' },
+    { id: 'usa.1', nombre: 'MLS', pais: 'Estados Unidos', paisEn: 'United States' },
   ] },
-  { nombre: 'Selecciones y otras', ligas: [
-    { id: 'uefa.nations', nombre: 'Nations League', pais: 'Selecciones' },
-    { id: 'fifa.worldq.uefa', nombre: 'Clasificación Mundial', pais: 'Selecciones UEFA' },
-    { id: 'ksa.1', nombre: 'Saudi Pro League', pais: 'Arabia Saudí' },
+  { nombre: 'Selecciones y otras', nombreEn: 'National teams and others', ligas: [
+    { id: 'uefa.nations', nombre: 'Nations League', pais: 'Selecciones', paisEn: 'National teams' },
+    { id: 'fifa.worldq.uefa', nombre: 'Clasificación Mundial', pais: 'Selecciones UEFA', paisEn: 'UEFA national teams' },
+    { id: 'ksa.1', nombre: 'Saudi Pro League', pais: 'Arabia Saudí', paisEn: 'Saudi Arabia' },
   ] },
 ];
 
-const LIGAS = GRUPOS_LIGAS.flatMap((g) => g.ligas.map((l) => ({ ...l, grupo: g.nombre, america: !!g.america })));
+// Nombres de competiciones que cambian en inglés
+const NOMBRES_LIGA_EN = { 'esp.2': 'LaLiga 2', 'esp.copa_del_rey': 'Copa del Rey', 'fifa.worldq.uefa': 'World Cup Qualifying' };
+
+// Lista plana de ligas, ya con los textos en el idioma de la página
+const LIGAS = GRUPOS_LIGAS.flatMap((g) => g.ligas.map((l) => ({
+  ...l,
+  nombre: EN ? NOMBRES_LIGA_EN[l.id] || l.nombre : l.nombre,
+  pais: EN ? l.paisEn : l.pais,
+  grupo: EN ? g.nombreEn : g.nombre,
+  america: !!g.america,
+})));
+const nombreGrupo = (g) => (EN ? g.nombreEn : g.nombre);
 
 // Ligas de las que se sacan las noticias generales
 const LIGAS_NOTICIAS = ['esp.1', 'eng.1', 'uefa.champions', 'ita.1', 'ger.1', 'fra.1', 'mex.1', 'arg.1'];
 
 const app = document.getElementById('app');
+
+/* =========================================================
+   DIRECCIONES (rutas sin "#": /fantasy, /liga/esp.1/clasificacion...)
+   En las plantillas los enlaces se escriben en español ("/fantasy");
+   ajustarEnlaces() les añade "/en" cuando la página está en inglés.
+   ========================================================= */
+const esRutaInterna = (h) => typeof h === 'string' && h.startsWith('/') && !h.startsWith('//')
+  && !/^\/(iconos|datos|js)\//.test(h) && !/\.(png|svg|jpg|json|xml|js|css|txt|webmanifest)(\?|$)/.test(h);
+const tienePrefijoEn = (h) => /^\/en(\/|\?|$)/.test(h);
+
+// Dirección en el idioma actual: enIdioma('/fantasy') -> '/en/fantasy' si la página está en inglés
+function enIdioma(h) {
+  if (!EN || !esRutaInterna(h) || tienePrefijoEn(h)) return h;
+  return h === '/' ? '/en/' : `/en${h}`;
+}
+
+function ajustarEnlaces(raiz) {
+  if (!EN || !raiz) return;
+  raiz.querySelectorAll('a[href^="/"]').forEach((a) => {
+    if (a.dataset.idioma) return; // botón de cambiar idioma: no se toca
+    a.setAttribute('href', enIdioma(a.getAttribute('href')));
+  });
+}
+
+// Ruta actual sin el prefijo de idioma: "/en/fantasy" -> "/fantasy"
+function rutaActual() {
+  const p = EN ? location.pathname.replace(/^\/en/, '') : location.pathname;
+  return p || '/';
+}
+
+// Misma página en el otro idioma
+function urlOtroIdioma() {
+  const camino = rutaActual();
+  const destino = EN ? camino : (camino === '/' ? '/en/' : `/en${camino}`);
+  return destino + location.search;
+}
 
 /* =========================================================
    UTILIDADES
@@ -210,27 +269,28 @@ function leerYmd(s) {
   return new Date(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8));
 }
 
-const fmtHora = (d) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-const fmtDiaLargo = (d) => d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-const fmtDiaCorto = (d) => d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-const fmtFechaCorta = (d) => d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+const fmtHora = (d) => d.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
+const fmtDiaLargo = (d) => d.toLocaleDateString(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
+const fmtDiaCorto = (d) => d.toLocaleDateString(LOCALE, { weekday: 'short', day: 'numeric', month: 'short' });
+const fmtFechaCorta = (d) => d.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' });
+const fmtNumero = (n, decimales = 1) => Number(n || 0).toLocaleString(LOCALE, { maximumFractionDigits: decimales });
 
 function haceTiempo(iso) {
   const min = Math.round((Date.now() - new Date(iso)) / 60000);
   if (!Number.isFinite(min)) return '';
-  if (min < 1) return 'Ahora mismo';
-  if (min < 60) return `Hace ${min} min`;
+  if (min < 1) return L('Ahora mismo', 'Just now');
+  if (min < 60) return L(`Hace ${min} min`, `${min} min ago`);
   const h = Math.round(min / 60);
-  if (h < 24) return `Hace ${h} h`;
+  if (h < 24) return L(`Hace ${h} h`, `${h} h ago`);
   const d = Math.round(h / 24);
-  return d === 1 ? 'Hace 1 día' : `Hace ${d} días`;
+  return d === 1 ? L('Hace 1 día', '1 day ago') : L(`Hace ${d} días`, `${d} days ago`);
 }
 
 /* ----- Dinero ----- */
-const fmtEuros = (n) => `${new Intl.NumberFormat('es-ES').format(Math.round(n || 0))} €`;
+const fmtEuros = (n) => `${new Intl.NumberFormat(LOCALE).format(Math.round(n || 0))} €`;
 function fmtMillones(n) {
   const v = (n || 0) / 1e6;
-  return `${v.toLocaleString('es-ES', { maximumFractionDigits: v >= 10 ? 1 : 2 })} M€`;
+  return `${v.toLocaleString(LOCALE, { maximumFractionDigits: v >= 10 ? 1 : 2 })} M€`;
 }
 function htmlCambio(n, conMillones = false) {
   if (!n) return '<span class="cambio igual">=</span>';

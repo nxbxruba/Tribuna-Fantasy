@@ -7,27 +7,28 @@
    internet (para tener lo último) y, sin conexión, usa la copia.
    Si cambias algún archivo, sube el número de VERSION.
    ========================================================= */
-const VERSION = 'infofut-fantasy-v9';
+const VERSION = 'infofut-fantasy-v10';
 const ARCHIVOS = [
-  './',
-  'index.html',
-  'estilos.css',
-  'manifest.webmanifest',
-  'datos/fantasy.js',
-  'datos/alineaciones.js',
-  'datos/fichajes.js',
-  'js/nucleo.js',
-  'js/partidos.js',
-  'js/posible-once.js',
-  'js/ligas.js',
-  'js/fantasy.js',
-  'js/fichajes.js',
-  'js/buscar.js',
-  'js/menu.js',
-  'js/app.js',
-  'iconos/logo.svg',
-  'iconos/icono-192.png',
-  'iconos/icono-512.png',
+  '/',
+  '/index.html',
+  '/estilos.css',
+  '/manifest.webmanifest',
+  '/seo.json',
+  '/datos/fantasy.js',
+  '/datos/alineaciones.js',
+  '/datos/fichajes.js',
+  '/js/nucleo.js',
+  '/js/partidos.js',
+  '/js/posible-once.js',
+  '/js/ligas.js',
+  '/js/fantasy.js',
+  '/js/fichajes.js',
+  '/js/buscar.js',
+  '/js/menu.js',
+  '/js/app.js',
+  '/iconos/logo.svg',
+  '/iconos/icono-192.png',
+  '/iconos/icono-512.png',
 ];
 
 self.addEventListener('install', (e) => {
@@ -49,10 +50,13 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((res) => {
-        const copia = res.clone();
-        caches.open(VERSION).then((c) => c.put(e.request, copia));
+        if (res.ok) {
+          const copia = res.clone();
+          caches.open(VERSION).then((c) => c.put(e.request, copia));
+        }
         return res;
       })
-      .catch(() => caches.match(e.request).then((r) => r || caches.match('index.html'))),
+      // Sin conexión: la copia guardada; y para cualquier sección (/fantasy, /en/...), la página principal
+      .catch(() => caches.match(e.request).then((r) => r || (e.request.mode === 'navigate' ? caches.match('/index.html') : undefined))),
   );
 });
